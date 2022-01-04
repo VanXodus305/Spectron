@@ -7,7 +7,7 @@ const client = new Discord.Client({ intents: intents });
 client.login(process.env.DISCORD_TOKEN);
 
 client.once('ready', () => {
-  console.log(`${client.user.tag} has logged in successfully.`);
+  console.log(`${client.user!.tag} has logged in successfully.`);
 });
 
 client.on('messageCreate', (msg) => {
