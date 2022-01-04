@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node .",
     "tsc": "tsc -w --skipLibCheck",
+    "dev": "nodemon index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
