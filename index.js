@@ -37,7 +37,7 @@ client.once('ready', () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     console.log(`${client.user.tag} has logged in successfully.`);
     const guildId = '751683524171530331';
-    const guild = client.guilds.cache.get(guildId);
+    const guild = yield client.guilds.fetch(guildId);
     let commands;
     if (guild) {
         commands = guild.commands;
@@ -51,26 +51,52 @@ client.once('ready', () => __awaiter(void 0, void 0, void 0, function* () {
     });
     commands === null || commands === void 0 ? void 0 : commands.create({
         name: 'add',
-        description: 'Adds two numbers',
+        description: 'Adds two numbers together',
         options: [
             {
                 name: 'number1',
-                description: 'The first number.',
+                description: 'The first number',
                 required: true,
-                type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.NUMBER,
+                type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.INTEGER,
             },
             {
                 name: 'number2',
-                description: 'The second number.',
+                description: 'The second number',
                 required: true,
-                type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.NUMBER,
+                type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.INTEGER,
             }
-        ],
+        ]
     });
+    //console.log(await commands?.fetch({ force: true }));
 }));
-client.on('messageCreate', (msg) => {
+client.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, function* () {
+    let embed = new discord_js_1.MessageEmbed();
+    if (!interaction.isCommand()) {
+        return;
+    }
+    const { commandName, options } = interaction;
+    if (commandName == 'ping') {
+        embed.setTitle('Pong!');
+        embed.setColor('GREEN');
+        interaction.reply({
+            fetchReply: true,
+            embeds: [embed]
+        });
+    }
+    else if (commandName === 'add') {
+        const num1 = options.getInteger('number1') || 0;
+        const num2 = options.getInteger('number2') || 0;
+        embed.setTitle(`The sum of ${num1} and ${num2} is = ${num1 + num2}`);
+        embed.setColor('GREEN');
+        interaction.reply({
+            fetchReply: true,
+            embeds: [embed]
+        });
+    }
+}));
+client.on('messageCreate', (msg) => __awaiter(void 0, void 0, void 0, function* () {
     if (msg.content === 'ping') {
         msg.reply('**Pong!**');
     }
-});
+}));
 client.login(process.env.DISCORD_TOKEN);
