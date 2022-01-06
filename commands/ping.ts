@@ -17,7 +17,7 @@ export default {
       message.channel.send({ embeds: [embed] }).then(resultMessage => {
         const ping = resultMessage.createdTimestamp - message.createdTimestamp;
         embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
-        embed.setTimestamp(resultMessage.createdTimestamp);
+        embed.setTimestamp(message.createdTimestamp);
         resultMessage.edit({ embeds: [embed] });
       });
     }
@@ -25,11 +25,11 @@ export default {
       embed.setTitle('Pong! 🏓');
       embed.setColor(11553764);
       embed.setFields([{ name: '🤖 Bot Latency', value: '\`\`\`Calculating...\`\`\`' }, { name: '💓 API Latency', value: '\`\`\`Calculating...\`\`\`' }]);
-      await interaction.reply({ embeds: [embed], fetchReply: true }).then(resultMessage => {
-        // const ping = resultMessage.createdTimestamp - interaction.createdTimestamp;
-        // embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
-        // embed.setTimestamp(resultMessage.createdTimestamp);
-        // resultMessage.edit({ embeds: [embed] });
+      const ping = Date.now() - interaction.createdTimestamp;
+      interaction.reply({ embeds: [embed], fetchReply: true }).then(resultMessage => {
+        embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
+        embed.setTimestamp(interaction.createdTimestamp);
+        interaction.editReply({ embeds: [embed] });
       });
     }
   }
