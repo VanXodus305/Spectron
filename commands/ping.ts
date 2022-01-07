@@ -26,7 +26,7 @@ export default {
       embed.setColor(11553764);
       embed.setFields([{ name: '🤖 Bot Latency', value: '\`\`\`Calculating...\`\`\`' }, { name: '💓 API Latency', value: '\`\`\`Calculating...\`\`\`' }]);
       const ping = Date.now() - interaction.createdTimestamp;
-      interaction.reply({ embeds: [embed], fetchReply: true }).then(resultMessage => {
+      await interaction.reply({ embeds: [embed], fetchReply: true }).then(resultMessage => {
         embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
         embed.setTimestamp(interaction.createdTimestamp);
         interaction.editReply({ embeds: [embed] });
