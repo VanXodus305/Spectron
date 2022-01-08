@@ -18,4 +18,10 @@ client.once('ready', async () => {
   console.log(`${client.user!.tag} has logged in successfully.`);
 });
 
+// setTimeout(async () => {
+//   await new testSchema({
+//     message: 'Hello World'
+//   }).save();
+// }, 1000);
+
 client.login(process.env.Discord_Token);
