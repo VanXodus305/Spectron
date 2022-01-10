@@ -25,8 +25,8 @@ export default {
       embed.setTitle('Pong! 🏓');
       embed.setColor(11553764);
       embed.setFields([{ name: '🤖 Bot Latency', value: '\`\`\`Calculating...\`\`\`' }, { name: '💓 API Latency', value: '\`\`\`Calculating...\`\`\`' }]);
-      const ping = Date.now() - interaction.createdTimestamp;
-      await interaction.reply({ embeds: [embed], fetchReply: true }).then(resultMessage => {
+      await interaction.reply({ embeds: [embed], fetchReply: true }).then((resultMessage: any ) => {
+        const ping = resultMessage.createdTimestamp - interaction.createdTimestamp;
         embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
         embed.setTimestamp(interaction.createdTimestamp);
         interaction.editReply({ embeds: [embed] });
