@@ -96,7 +96,7 @@ export default {
         if (synonyms == "") {
           synonyms = 'None';
         }
-        embed.addField(`Synonyms`, `\`\`\`\n${synonyms}\`\`\``, true);
+        embed.addField(`Synonyms`, `\`\`\`${synonyms}\`\`\``, true);
       }
 
       if (result.synopsis) {
@@ -133,7 +133,7 @@ export default {
       embed.addField("Media Info", `\`\`\`${media}\`\`\``, true);
 
       let genres = "";
-      result.genres.forEach((genre: any) => genres += `\n${genre.name}`);
+      result.genres.forEach((genre: any) => genres += `\n• ${genre.name}`);
       embed.addField('Genres:', `\`\`\`${genres}\`\`\``, true);
 
       let status = `\n${result.status.toUpperCase().replace('_', ' ')}`;
@@ -146,7 +146,7 @@ export default {
       embed.addField('Status', `\`\`\`${status}\`\`\``, true);
 
       let studios = "";
-      result.studios.forEach((studio: any) => studios += `\n${studio.name}`);
+      result.studios.forEach((studio: any) => studios += `\n• ${studio.name}`);
       if (studios == "") {
         studios = 'Unknown';
       }
