@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 config();
+const keepAlive = require("./server.js");
 import Discord, { Intents, MessageEmbed } from 'discord.js';
 import WOKCommands from 'wokcommands';
 import path from 'path';
