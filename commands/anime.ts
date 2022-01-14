@@ -133,16 +133,20 @@ export default {
       embed.addField("Media Info", `\`\`\`${media}\`\`\``, true);
 
       let genres = "";
-      result.genres.forEach((genre: any) => genres += `\n• ${genre.name}`);
+      result.genres.forEach((genre: any) => genres += `\n${genre.name}`);
       embed.addField('Genres:', `\`\`\`${genres}\`\`\``, true);
 
-      let status = `\n${result.status.toUpperCase().replace('_', ' ')}`;
+      let status = "";
       if (result.start_date) {
         status += `\nFROM: ${result.start_date}`;
       }
       if (result.end_date) {
         status += `\nTO: ${result.end_date}`;
       }
+      if (result.start_date && result.end_date && result.start_date == result.end_date) {
+        status = `\nON: ${result.start_date}`;
+      }
+      status = `\n${result.status.toUpperCase().replace('_', ' ')}` + status;
       embed.addField('Status', `\`\`\`${status}\`\`\``, true);
 
       let studios = "";

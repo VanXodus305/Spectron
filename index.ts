@@ -25,4 +25,5 @@ client.once('ready', async () => {
 //   }).save();
 // }, 1000);
 
+keepAlive();
 client.login(process.env.Discord_Token);
