@@ -5,7 +5,7 @@ export default {
   category: "Test Commands",
   description: "Provides the latency of the bot and the API",
   slash: 'both',
-  testOnly: true,
+  // testOnly: false,
   callback: async ({ client, interaction, message }) => {
     let embed = new MessageEmbed();
     embed.setTitle('Pong!');
@@ -25,11 +25,11 @@ export default {
       embed.setTitle('Pong! 🏓');
       embed.setColor(11553764);
       embed.setFields([{ name: '🤖 Bot Latency', value: '\`\`\`Calculating...\`\`\`' }, { name: '💓 API Latency', value: '\`\`\`Calculating...\`\`\`' }]);
-      await interaction.reply({ embeds: [embed], fetchReply: true }).then((resultMessage: any ) => {
+      interaction.reply({ embeds: [embed], fetchReply: true }).then(async (resultMessage: any) => {
         const ping = resultMessage.createdTimestamp - interaction.createdTimestamp;
         embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
         embed.setTimestamp(interaction.createdTimestamp);
-        interaction.editReply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
       });
     }
   }

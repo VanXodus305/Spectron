@@ -14,16 +14,19 @@ client.once('ready', async () => {
     commandsDir: path.join(__dirname, 'commands'),
     typeScript: true,
     testServers: '751683524171530331',
+    botOwners:'588933434412498964',
     mongoUri: process.env.MongoDB_URI
-  }).setDefaultPrefix('+');
+  }).setDefaultPrefix('+').setColor(11553764);;
   console.log(`${client.user!.tag} has logged in successfully.`);
 });
 
-// setTimeout(async () => {
-//   await new testSchema({
-//     message: 'Hello World'
-//   }).save();
-// }, 1000);
+client.on('messageCreate', async (message: any) => {
+  if (message.embeds[0]?.image?.url == "https://disboard.org/images/bot-command-image-bump.png") {
+    setTimeout(async () => {
+      message.channel.send("<@&936157167487176705> **The server can be bumped now!**");
+    }, 7200000);
+  }
+});
 
 keepAlive();
 client.login(process.env.Discord_Token);

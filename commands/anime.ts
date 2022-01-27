@@ -16,7 +16,7 @@ export default {
   ],
   description: "Gives information about an anime from MyAnimeList",
   slash: 'both',
-  testOnly: true,
+  // testOnly: false,
   callback: async ({ interaction, message, text, options }) => {
     let embed = new MessageEmbed();
 
@@ -40,8 +40,8 @@ export default {
       } else {
         embed.setColor((interaction as any).member?.displayHexColor!);
       }
-      await interaction.deferReply();
-      interaction.editReply({ embeds: [await search(interaction.options.getString('query'))] });
+      interaction.deferReply();
+      await interaction.editReply({ embeds: [await search(interaction.options.getString('query'))] });
     }
 
     async function search(term: any) {
