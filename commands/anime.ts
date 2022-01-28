@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch'
-import Discord, { MessageEmbed } from "discord.js";
+import Discord, { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { config } from 'dotenv';
 config();
 import { ICommand } from "wokcommands";
@@ -16,35 +16,26 @@ export default {
   ],
   description: "Gives information about an anime from MyAnimeList",
   slash: 'both',
-  // testOnly: false,
-  callback: async ({ interaction, message, text, options }) => {
-    let embed = new MessageEmbed();
-
+  testOnly: false,
+  callback: async ({ member, interaction, message, text, client }) => {
+    const msgEmbed = new MessageEmbed();
     if (message) {
       if (!text) {
-        embed.setTitle(`⚠️ Please provide a term to search for.`);
-        embed.setColor(`#ffde34`);
-        return embed;
+        msgEmbed.setTitle(`⚠️ Please provide a term to search for.`);
+        msgEmbed.setColor(`#ffde34`);
+        return msgEmbed;
       }
-      if (message.member?.displayColor == 0) {
-        embed.setColor(11553764);
-      } else {
-        embed.setColor(message.member?.displayHexColor!);
-      }
-      message.channel.send({ embeds: [await search(text)] });
+      message.channel.send(await search(text));
     }
 
     if (interaction) {
-      if ((interaction as any).member?.displayColor == 0) {
-        embed.setColor(11553764);
-      } else {
-        embed.setColor((interaction as any).member?.displayHexColor!);
-      }
-      interaction.deferReply();
-      await interaction.editReply({ embeds: [await search(interaction.options.getString('query'))] });
+      interaction.deferReply({ fetchReply: true });
+      await interaction.editReply(await search(interaction.options.getString('query')));
     }
 
     async function search(term: any) {
+      let embed = new MessageEmbed();
+      let row = new MessageActionRow();
       if (!isNaN(term)) {
         let idResponse: any = await fetch(`https://api.myanimelist.net/v2/anime/${term}?fields=id,title,main_picture,alternative_titles,start_date,media_type,end_date,synopsis,nsfw,status,genres,num_episodes,average_episode_duration,rating,pictures,related_anime,studios`, {
           method: "GET",
@@ -52,14 +43,14 @@ export default {
         });
         idResponse = await idResponse.json();
         if (idResponse.error) {
-          return await termSearch(term);
+          return await termSearch(term, embed, row);
         }
-        return embedBuilder(idResponse);
+        return embedBuilder(idResponse, embed, row);
       }
-      return await termSearch(term);
+      return await termSearch(term, embed, row);
     }
 
-    async function termSearch(term: any) {
+    async function termSearch(term: any, embed: any, row: any) {
       let nameResponse: any = await fetch(`https://api.myanimelist.net/v2/anime?q=${term}`, {
         method: "GET",
         headers: { "X-MAL-CLIENT-ID": `${process.env.MAL_Client_ID}` }
@@ -67,18 +58,34 @@ export default {
       nameResponse = await nameResponse.json();
       if (!nameResponse.data[0]) {
         embed.setColor('#ff0000');
-        embed.setTitle('❌ No results were found.\nPlease check the query and try again.');
-        return embed;
+        embed.setTitle('❌ No results were found. Please check the query and try again.');
+        return { embeds: [embed] };
       }
       let response = await fetch(`https://api.myanimelist.net/v2/anime/${nameResponse.data[0].node.id}?fields=id,title,main_picture,alternative_titles,media_type,start_date,end_date,synopsis,nsfw,status,genres,num_episodes,average_episode_duration,rating,pictures,related_anime,studios`, {
         method: "GET",
         headers: { "X-MAL-CLIENT-ID": `${process.env.MAL_Client_ID}` }
       });
       response = await response.json();
-      return await embedBuilder(response);
+      return await embedBuilder(response, embed, row);
     }
 
-    async function embedBuilder(result: any) {
+    async function embedBuilder(result: any, embed: any, row: any) {
+      if (message) {
+        if (message.member?.displayColor == 0) {
+          embed.setColor(11553764);
+        } else {
+          embed.setColor(message.member?.displayHexColor!);
+        }
+      }
+
+      if (interaction) {
+        if ((interaction as any).member?.displayColor == 0) {
+          embed.setColor(11553764);
+        } else {
+          embed.setColor((interaction as any).member?.displayHexColor!);
+        }
+      }
+
       embed.setTitle(result.title);
       embed.setURL(`https://myanimelist.net/anime/${result.id}`);
       if (result.alternative_titles) {
@@ -157,7 +164,55 @@ export default {
       embed.addField('Studios', `\`\`\`${studios}\`\`\``, true);
 
       embed.setTimestamp(Date.now());
-      return embed;
+
+      if (result.related_anime) {
+        const prequel = result.related_anime.find((anime: any) => anime.relation_type == "prequel");
+        const sequel = result.related_anime.find((anime: any) => anime.relation_type == "sequel");
+        const parent = result.related_anime.find((anime: any) => anime.relation_type == "parent_story");
+
+        if (prequel) {
+          row.addComponents(
+            new MessageButton()
+              .setCustomId(`${prequel.node.id}_anime`)
+              .setLabel(`Prequel - ${prequel.node.title}`)
+              .setStyle('PRIMARY')
+              .setEmoji('⬅️')
+          );
+        }
+        if (parent) {
+          row.addComponents(
+            new MessageButton()
+              .setCustomId(`${parent.node.id}_anime`)
+              .setLabel(`Prent Story - ${parent.node.title}`)
+              .setStyle('SECONDARY')
+              .setEmoji('⬆️')
+          );
+        }
+        if (sequel) {
+          row.addComponents(
+            new MessageButton()
+              .setCustomId(`${sequel.node.id}_anime`)
+              .setLabel(`Sequel - ${sequel.node.title}`)
+              .setStyle('SUCCESS')
+              .setEmoji('➡️')
+          );
+        }
+      }
+
+      if (row.components[0]) {
+        return { embeds: [embed], components: [row] };
+      }
+      else {
+        return { embeds: [embed] };
+      }
     }
+    client.on('interactionCreate', async (intr: any) => {
+      if (intr.isButton() && intr.customId.endsWith('anime') && intr.member == member) {
+        const newAnime = await search(parseInt(intr.customId));
+        intr.deferUpdate().then(async () => {
+          await intr.message.edit(newAnime);
+        });
+      }
+    });
   }
 } as ICommand
