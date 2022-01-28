@@ -1,6 +1,5 @@
 import { config } from 'dotenv';
 config();
-const keepAlive = require("./server.js");
 import Discord, { Intents, MessageEmbed } from 'discord.js';
 import WOKCommands from 'wokcommands';
 import path from 'path';
@@ -28,5 +27,4 @@ client.on('messageCreate', async (message: any) => {
   }
 });
 
-keepAlive();
 client.login(process.env.Discord_Token);
