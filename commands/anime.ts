@@ -1,4 +1,5 @@
 import fetch from 'cross-fetch'
+import { AnimixPlay } from "animewizard"
 import Discord, { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { config } from 'dotenv';
 config();
@@ -16,7 +17,7 @@ export default {
   ],
   description: "Gives information about an anime from MyAnimeList",
   slash: 'both',
-  testOnly: false,
+  testOnly: true,
   callback: async ({ member, interaction, message, text, client }) => {
     const msgEmbed = new MessageEmbed();
     if (message) {
@@ -196,7 +197,18 @@ export default {
               .setStyle('SUCCESS')
               .setEmoji('➡️')
           );
-        }
+        }        
+      }
+
+      const animixPlay = new AnimixPlay();
+      let animes = await animixPlay.search(result.title);
+      if (animes[0]) {
+        row.addComponents(
+          new MessageButton()
+            .setLabel('Watch on AnimixPlay')
+            .setStyle('LINK')
+            .setURL(`https://animixplay.to${animes[0].url}`)
+        );
       }
 
       if (row.components[0]) {
@@ -207,7 +219,7 @@ export default {
       }
     }
     client.on('interactionCreate', async (intr: any) => {
-      if (intr.isButton() && intr.customId.endsWith('anime') && intr.member == member) {
+      if (intr.isButton() && intr.customId?.endsWith('anime') && intr.member == member) {
         const newAnime = await search(parseInt(intr.customId));
         intr.deferUpdate().then(async () => {
           await intr.message.edit(newAnime);
