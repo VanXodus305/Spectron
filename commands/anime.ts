@@ -142,7 +142,7 @@ export default {
 
       let genres = "";
       result.genres.forEach((genre: any) => genres += `\n${genre.name}`);
-      embed.addField('Genres:', `\`\`\`${genres}\`\`\``, true);
+      embed.addField('Genres', `\`\`\`${genres}\`\`\``, true);
 
       let status = "";
       if (result.start_date) {
@@ -184,7 +184,7 @@ export default {
           row.addComponents(
             new MessageButton()
               .setCustomId(`${parent.node.id}_anime`)
-              .setLabel(`Prent Story - ${parent.node.title}`)
+              .setLabel(`Parent Story - ${parent.node.title}`)
               .setStyle('SECONDARY')
               .setEmoji('⬆️')
           );
