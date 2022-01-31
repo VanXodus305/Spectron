@@ -6,7 +6,18 @@ config();
 import { ICommand } from "wokcommands";
 
 export default {
-  category: "Test Commands",
+  category: "Utility",
+  expectedArgs: "<query>",
+  syntaxError: {
+    "english": "**Incorrect syntax! Please use \`{PREFIX}{COMMAND} {ARGUMENTS}\`**",
+    "spanish": "**¡Uso incorrecto! Utilice \`{PREFIX} {COMMAND} {ARGUMENTS}\`**"
+  },
+  error: async ({ error, info }) => {
+    if (error == 'EXCEPTION') {
+     console.log(info);
+    }
+  },
+  minArgs: 1,
   options: [
     {
       name: 'query',
@@ -20,17 +31,12 @@ export default {
   testOnly: false,
   callback: async ({ member, interaction, message, text, client }) => {
     const msgEmbed = new MessageEmbed();
-    if (message) {
-      if (!text) {
-        msgEmbed.setTitle(`⚠️ Please provide a term to search for.`);
-        msgEmbed.setColor(`#ffde34`);
-        return msgEmbed;
-      }
+    if (message) {      
       message.channel.send(await search(text));
     }
 
     if (interaction) {
-      interaction.deferReply({ fetchReply: true });
+      await interaction.deferReply({ fetchReply: true });
       await interaction.editReply(await search(interaction.options.getString('query')));
     }
 
@@ -220,10 +226,10 @@ export default {
     }
     client.on('interactionCreate', async (intr: any) => {
       if (intr.isButton() && intr.customId?.endsWith('anime') && intr.member == member) {
+        const response = intr.message;
+        await intr.deferUpdate();
         const newAnime = await search(parseInt(intr.customId));
-        intr.deferUpdate().then(async () => {
-          await intr.message.edit(newAnime);
-        });
+        await response.edit(newAnime);
       }
     });
   }
