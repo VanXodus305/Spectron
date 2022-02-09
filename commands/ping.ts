@@ -5,17 +5,11 @@ export default {
   category: "Info",
   description: "Provides the latency of the bot and the API",
   slash: 'both',
-  error: async ({ error, info }) => {
-    if (error == 'EXCEPTION') {
-      console.log(info)
-    }
-  },
   syntaxError: {
-    "english": "**Incorrect syntax! Please use \`{PREFIX}{COMMAND} {ARGUMENTS}\`**",
-    "spanish": "**¡Uso incorrecto! Utilice \`{PREFIX} {COMMAND} {ARGUMENTS}\`**"
+    "english": "**Incorrect syntax! Please use \`{PREFIX}{COMMAND} {ARGUMENTS}\`**"
   },
   maxArgs: 0,
-  // testOnly: false,
+  testOnly: true,
   callback: async ({ client, interaction, message }) => {
     let embed = new MessageEmbed();
     embed.setTitle('Pong!');

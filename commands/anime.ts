@@ -9,13 +9,7 @@ export default {
   category: "Utility",
   expectedArgs: "<query>",
   syntaxError: {
-    "english": "**Incorrect syntax! Please use \`{PREFIX}{COMMAND} {ARGUMENTS}\`**",
-    "spanish": "**¡Uso incorrecto! Utilice \`{PREFIX} {COMMAND} {ARGUMENTS}\`**"
-  },
-  error: async ({ error, info }) => {
-    if (error == 'EXCEPTION') {
-     console.log(info);
-    }
+    "english": "**Incorrect syntax! Please use \`{PREFIX}{COMMAND} {ARGUMENTS}\`**"
   },
   minArgs: 1,
   options: [
@@ -28,10 +22,10 @@ export default {
   ],
   description: "Gives information about an anime from MyAnimeList",
   slash: 'both',
-  testOnly: false,
+  testOnly: true,
   callback: async ({ member, interaction, message, text, client }) => {
     const msgEmbed = new MessageEmbed();
-    if (message) {      
+    if (message) {
       message.channel.send(await search(text));
     }
 
@@ -110,11 +104,14 @@ export default {
         if (synonyms == "") {
           synonyms = 'None';
         }
+        synonyms = synonyms.length > 1024 ? synonyms.substring(0, length - 7) + "…" : synonyms;
         embed.addField(`Synonyms`, `\`\`\`${synonyms}\`\`\``, true);
       }
 
       if (result.synopsis) {
-        embed.setDescription(`**${result.synopsis}**`);
+        let synopsis = result.synopsis;
+        synopsis = synopsis.length > 4096 ? synopsis.substring(0, length - 5) + "…" : synopsis;
+        embed.setDescription(`**${synopsis}**`);
       }
 
       if (result.main_picture) {
@@ -148,6 +145,7 @@ export default {
 
       let genres = "";
       result.genres.forEach((genre: any) => genres += `\n${genre.name}`);
+      genres = genres.length > 1024 ? genres.substring(0, length - 1) + "…" : genres;
       embed.addField('Genres', `\`\`\`${genres}\`\`\``, true);
 
       let status = "";
@@ -168,6 +166,7 @@ export default {
       if (studios == "") {
         studios = 'Unknown';
       }
+      studios = studios.length > 1024 ? studios.substring(0, length - 1) + "…" : studios;
       embed.addField('Studios', `\`\`\`${studios}\`\`\``, true);
 
       embed.setTimestamp(Date.now());
@@ -203,7 +202,7 @@ export default {
               .setStyle('SUCCESS')
               .setEmoji('➡️')
           );
-        }        
+        }
       }
 
       const animixPlay = new AnimixPlay();
