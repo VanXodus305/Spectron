@@ -9,7 +9,7 @@ export default {
     "english": "**Incorrect syntax! Please use \`{PREFIX}{COMMAND} {ARGUMENTS}\`**"
   },
   maxArgs: 0,
-  testOnly: true,
+  testOnly: false,
   callback: async ({ client, interaction, message }) => {
     let embed = new MessageEmbed();
     embed.setTitle('Pong!');

@@ -22,7 +22,7 @@ export default {
   ],
   description: "Gives information about an anime from MyAnimeList",
   slash: 'both',
-  testOnly: true,
+  testOnly: false,
   callback: async ({ member, interaction, message, text, client }) => {
     const msgEmbed = new MessageEmbed();
     if (message) {
