@@ -54,7 +54,7 @@ client.on('messageDelete', async (message: any) => {
         const formData: any = new FormData();
         formData.append("image", `${message.attachments.first().url}`);
         formData.append("key", `${process.env.ImgBB_Token}`);
-        formData.append("expiration", ``)
+        formData.append("expiration", "864000")
         let image: any = await fetch('https://api.imgbb.com/1/upload', {
           method: 'POST',
           body: formData,
