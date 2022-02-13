@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "16.14.0"
+    "node": "<17.5.0"
   },
   "dependencies": {
     "animewizard": "^1.0.4",
