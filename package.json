@@ -24,6 +24,7 @@
     "mongoose": "^6.2.1",
     "translation-google": "^0.2.1",
     "ts-node": "^10.5.0",
+    "typescript": "^4.5.5",
     "wokcommands": "^1.5.3"
   }
 }
