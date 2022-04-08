@@ -3,7 +3,7 @@ config();
 import Discord, { Intents, MessageActionRow, MessageEmbed } from 'discord.js';
 import WOKCommands from 'wokcommands';
 import path from 'path';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import fetch from "cross-fetch";
 import FormData from 'form-data';
 import fs from 'fs';

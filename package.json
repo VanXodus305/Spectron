@@ -11,9 +11,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "engines": {
-    "node": "<17.5.0"
-  },
   "dependencies": {
     "animewizard": "^1.0.4",
     "cross-fetch": "^3.1.5",
@@ -22,7 +19,8 @@
     "dotenv": "^16.0.0",
     "download": "^8.0.0",
     "form-data": "^4.0.0",
-    "mongoose": "^6.2.4",
+    "mongoose": "^6.2.10",
+    "social_media_downloader": "^1.0.6",
     "translation-google": "^0.2.1",
     "ts-node": "^10.7.0",
     "wokcommands": "^1.5.3"
