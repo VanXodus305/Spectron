@@ -1,8 +1,5 @@
 import Discord, { Interaction, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } from "discord.js";
-import { config } from 'dotenv';
-config();
 import { ICommand } from "wokcommands";
-
 
 export default {
   category: "Utility",
