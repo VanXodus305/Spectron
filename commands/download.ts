@@ -22,7 +22,7 @@ export default {
     }
   ],
   description: "Download videos from sites like YouTube, TikTok and many more.",
-  slash: 'both',
+  slash: true,
   testOnly: true,
   callback: async ({ interaction, message, text, member }) => {
     const embed = new MessageEmbed();
