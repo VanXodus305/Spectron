@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 config();
-import Discord, { Intents, MessageActionRow, MessageEmbed } from 'discord.js';
+import Discord, { GatewayIntentBits, ActionRow, EmbedBuilder } from 'discord.js';
 import WOKCommands from 'wokcommands';
 import path from 'path';
 import mongoose from 'mongoose';
@@ -9,11 +9,11 @@ import FormData from 'form-data';
 import fs from 'fs';
 const download = require('download');
 
-const intents = [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_WEBHOOKS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING, Intents.FLAGS.GUILD_SCHEDULED_EVENTS];
+const intents = [GatewayIntentBits.Guilds];
 const client = new Discord.Client({ intents: intents });
 
 client.once('ready', async () => {
-  new WOKCommands(client, {
+  new WOKCommands(client as any, {
     commandsDir: path.join(__dirname, 'commands'),
     featuresDir: path.join(__dirname, 'features'),
     typeScript: true,
@@ -24,7 +24,7 @@ client.once('ready', async () => {
   console.log(`${client.user!.tag} has logged in successfully.`);
 });
 
-client.on('messageCreate', async (message: any) => {
+client.on('messageCreate', async (message: Discord.Message) => {
   if (message.author.id == "302050872383242240" && message.embeds[0]?.image?.url == "https://disboard.org/images/bot-command-image-bump.png") {
     setTimeout(async () => {
       message.channel.send("<@&936157167487176705> **The server can be bumped now!**");
