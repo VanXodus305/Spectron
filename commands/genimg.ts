@@ -15,7 +15,7 @@ export default {
       description: 'The textual description of the image',
       required: true,
       maxLength: 100,
-      type: "STRING",
+      type: ApplicationCommandOptionType.String as unknown,
     }
   ],
 
