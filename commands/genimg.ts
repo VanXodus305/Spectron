@@ -18,27 +18,27 @@ export default {
       type: ApplicationCommandOptionType.String as unknown,
     }
   ],
-
   maxArgs: 1,
   minArgs: 1,
-  testOnly: true,
+  testOnly: false,
   expectedArgs: '<prompt>',
   aliases: ['img'],
-  callback: async ({ interaction, message}) => {
+  callback: async ({ interaction }) => {
     let int = interaction as unknown as Discord.CommandInteraction;
+
     const embed = new EmbedBuilder();
     embed.setTitle('Generating Image...');
 
-    await int.reply({ embeds: [embed], fetchReply: true }).then(async (resultMessage: any) => {
-      await int.editReply(await genImg(interaction.options.getString('prompt')));
+    await int.reply({ embeds: [embed] }).then(async () => {
+      await int.editReply(await genImg(int.options.get("prompt")?.value));
     });
 
     async function genImg(query: any) {
-      const credentials = {
-        email: 'soumyadeep.30505@gmail.com',
-        password: 'SKundu@30505',
-      };
-      const wombo = buildDefaultInstance(credentials);
+      // const credentials = {
+      //   email: 'soumyadeep.30505@gmail.com',
+      //   password: 'SKundu@30505',
+      // };
+      const wombo = buildDefaultInstance();
 
       // const styles = await wombo.fetchStyles();
       // console.log(styles);
