@@ -9,28 +9,32 @@ import FormData from 'form-data';
 import fs from 'fs';
 const download = require('download');
 
-const intents = [GatewayIntentBits.Guilds];
-const client = new Discord.Client({ intents: intents });
+const client = new Discord.Client({ intents: ['Guilds', 'GuildMessages', 'MessageContent', 'GuildVoiceStates'] });
 
 client.once('ready', async () => {
   new WOKCommands(client as any, {
     commandsDir: path.join(__dirname, 'commands'),
     featuresDir: path.join(__dirname, 'features'),
     typeScript: true,
+    ignoreBots: true,
     testServers: ['751683524171530331', '746313837049020517'],
     botOwners: '588933434412498964',
     mongoUri: process.env.MongoDB_URI
-  }).setDefaultPrefix('+').setColor(11553764);;
+  }).setDefaultPrefix('Spectron')
+    .setColor(11553764);
+
   console.log(`${client.user!.tag} has logged in successfully.`);
 });
 
-client.on('messageCreate', async (message: Discord.Message) => {
-  if (message.author.id == "302050872383242240" && message.embeds[0]?.image?.url == "https://disboard.org/images/bot-command-image-bump.png") {
-    setTimeout(async () => {
-      message.channel.send("<@&936157167487176705> **The server can be bumped now!**");
-    }, 7200000);
-  }
-});
+client.login(process.env.Discord_Token);
+
+// client.on('messageCreate', async (message: Discord.Message) => {
+//   if (message.author.id == "302050872383242240" && message.embeds[0]?.image?.url == "https://disboard.org/images/bot-command-image-bump.png") {
+//     setTimeout(async () => {
+//       message.channel.send("<@&936157167487176705> **The server can be bumped now!**");
+//     }, 7200000);
+//   }
+// });
 
 // client.on('messageDelete', async (message: any) => {
 //   if (message.content == "" && message.attachments.size == 0) {
@@ -92,5 +96,3 @@ client.on('messageCreate', async (message: Discord.Message) => {
 //   client.channels.fetch(`794624483537059860`, { allowUnknownGuild: true, force: true })
 //     .then(async (channel: any) => channel.send({ embeds: [await getFiles(message)] }));
 // });
-
-client.login(process.env.Discord_Token);

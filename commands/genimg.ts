@@ -1,4 +1,4 @@
-import Discord, { EmbedBuilder, ApplicationCommandOptionType, GuildDiscoverySplashFormat } from "discord.js";
+import Discord, { EmbedBuilder, ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { ICommand } from "wokcommands";
 import { buildDefaultInstance } from 'wombo-dream-api';
 
@@ -20,7 +20,7 @@ export default {
   ],
   maxArgs: 1,
   minArgs: 1,
-  testOnly: false,
+  testOnly: true,
   expectedArgs: '<prompt>',
   aliases: ['img'],
   callback: async ({ interaction }) => {
@@ -28,9 +28,16 @@ export default {
 
     const embed = new EmbedBuilder();
     embed.setTitle('Generating Image...');
+    // const row = new ActionRowBuilder();
+    // row.addComponents(
+    //   new ButtonBuilder()
+    //     .setLabel('Regenerate')
+    //     .setStyle(ButtonStyle.Success)
+    //     .setEmoji('🔄')
+    // );
 
     await int.reply({ embeds: [embed] }).then(async () => {
-      await int.editReply(await genImg(int.options.get("prompt")?.value));
+      await int.editReply({embeds: [await genImg(int.options.get("prompt")?.value)]});
     });
 
     async function genImg(query: any) {
@@ -50,7 +57,7 @@ export default {
 
       embed.setTitle(`${query}`);
       embed.setImage(`${generatedTask.result?.final}`);
-      return { embeds: [embed] };
+      return embed;
     }
   }
 } as ICommand
