@@ -72,7 +72,6 @@ export default {
           embed.addFields({ name: 'Artists', value: '\`\`\`\n' + artists + '\`\`\`', inline: false });
           embed.addFields({ name: 'Album', value: '\`\`\`\n' + song.results[0]?.album?.name + '\`\`\`', inline: true });
           embed.addFields({ name: 'Duration', value: '\`\`\`\n' + duration + '\`\`\`', inline: true });
-
         }
         return embed;
       }
