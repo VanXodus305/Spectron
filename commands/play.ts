@@ -22,7 +22,7 @@ export default {
   ],
   maxArgs: 1,
   minArgs: 1,
-  testOnly: true,
+  testOnly: false,
   expectedArgs: '<query>',
   aliases: ['join'],
   callback: async ({ interaction }) => {
