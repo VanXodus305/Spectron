@@ -3,7 +3,7 @@ const express = require("express")
 const server = express()
 
 server.all("/", (req, res) => {
-  res.send("Bot is running!")
+  res.send("Spectron#6051 is online.")
 })
 
 function keepAlive() {
