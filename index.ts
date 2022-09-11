@@ -8,6 +8,7 @@ import fetch from "cross-fetch";
 import FormData from 'form-data';
 import fs from 'fs';
 const download = require('download');
+const keepAlive = require("./server")
 
 const client = new Discord.Client({ intents: ['Guilds', 'GuildMessages', 'MessageContent', 'GuildVoiceStates'] });
 
@@ -26,6 +27,7 @@ client.once('ready', async () => {
   console.log(`${client.user!.tag} has logged in successfully.`);
 });
 
+keepAlive();
 client.login(process.env.Discord_Token);
 
 // client.on('messageCreate', async (message: Discord.Message) => {
