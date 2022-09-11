@@ -42,8 +42,8 @@ export default {
 
     async function genImg(query: any) {
       // const credentials = {
-      //   email: 'soumyadeep.30505@gmail.com',
-      //   password: 'SKundu@30505',
+      //   email: '',
+      //   password: '',
       // };
       const wombo = buildDefaultInstance();
 
