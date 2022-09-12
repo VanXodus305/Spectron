@@ -27,8 +27,8 @@ export default {
   aliases: ['join'],
   callback: async ({ interaction }) => {
     let int = interaction as any;
+    const embed = new EmbedBuilder();
     if (int.member?.voice?.channel) {
-      const embed = new EmbedBuilder();
       embed.setTitle('🔍 Searching for song...');
       embed.setColor(11553764);
 
@@ -36,8 +36,35 @@ export default {
         await int.editReply({ embeds: [await searchSong(int.options.get("query")?.value as string)] });
       });
 
-
       async function searchSong(searchTerm: String) {
+        if (searchTerm.startsWith('http')) {
+          if (searchTerm.includes('spotify')) {
+            let spotifyID: String;
+            if (searchTerm.includes('track')) {
+              spotifyID = searchTerm.substring(searchTerm.indexOf('track') + 6, searchTerm.indexOf('track') + 28);
+              let spotifyToken: any = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Authorization': 'Basic ' + btoa(process.env.Spotify_Client_ID + ":" + process.env.Spotify_Client_Secret)
+                },
+                body: 'grant_type=client_credentials'
+              });
+              spotifyToken = await spotifyToken.json();
+              spotifyToken = spotifyToken.access_token;
+
+              let spotifyTrack: any = await fetch(`https://api.spotify.com/v1/tracks/${spotifyID}`, {
+                method: 'GET',
+                headers: {
+                  'Authorization': 'Bearer ' + spotifyToken
+                }
+              });
+              spotifyTrack = await spotifyTrack.json();
+              searchTerm = spotifyTrack?.name + ' ' + spotifyTrack?.artists[0]?.name;
+            }
+          }
+        }
+
         const result: any = await fetch(`https://saavn.me/search/songs?query=${searchTerm}&limit=1`, {
           method: 'GET',
           headers: {
@@ -73,9 +100,12 @@ export default {
           embed.addFields({ name: 'Album', value: '\`\`\`\n' + song.results[0]?.album?.name + '\`\`\`', inline: true });
           embed.addFields({ name: 'Duration', value: '\`\`\`\n' + duration + '\`\`\`', inline: true });
         }
+        else {
+          embed.setTitle('❌ No songs were found for the provided query');
+        }
+
         return embed;
       }
-
 
       async function playSong(song: any) {
         const player = createAudioPlayer();
@@ -95,6 +125,11 @@ export default {
         });
         player.play(resource);
       }
+    }
+    else {
+      embed.setColor(11553764);
+      embed.setTitle('⚠️ You must be in a voice channel first to use this command');
+      int.reply({ embeds: [embed] });
     }
   }
 } as ICommand
