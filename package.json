@@ -32,8 +32,5 @@
     "ts-node": "^10.9.1",
     "wokcommands": "^1.5.3",
     "wombo-dream-api": "^0.1.6"
-  },
-  "devDependencies": {
-    "@architect/sandbox": "^5.3.4"
   }
 }
