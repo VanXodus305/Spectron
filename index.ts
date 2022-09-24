@@ -1,27 +1,34 @@
-import { config } from 'dotenv';
+import { config } from "dotenv";
 config();
-import Discord, { GatewayIntentBits, ActionRow, EmbedBuilder } from 'discord.js';
-import WOKCommands from 'wokcommands';
-import path from 'path';
-import mongoose from 'mongoose';
+import Discord, {
+  GatewayIntentBits,
+  ActionRow,
+  EmbedBuilder,
+} from "discord.js";
+import WOKCommands from "wokcommands";
+import path from "path";
+import mongoose from "mongoose";
 import fetch from "cross-fetch";
-import FormData from 'form-data';
-import fs from 'fs';
-const download = require('download');
-const keepAlive = require("./server")
+import FormData from "form-data";
+import fs from "fs";
+const download = require("download");
+const keepAlive = require("./server");
 
-const client = new Discord.Client({ intents: ['Guilds', 'GuildMessages', 'MessageContent', 'GuildVoiceStates'] });
+const client = new Discord.Client({
+  intents: ["Guilds", "GuildMessages", "MessageContent", "GuildVoiceStates"],
+});
 
-client.once('ready', async () => {
+client.once("ready", async () => {
   new WOKCommands(client as any, {
-    commandsDir: path.join(__dirname, 'commands'),
-    featuresDir: path.join(__dirname, 'features'),
+    commandsDir: path.join(__dirname, "commands"),
+    featuresDir: path.join(__dirname, "features"),
     typeScript: true,
     ignoreBots: true,
-    testServers: ['751683524171530331', '746313837049020517'],
-    botOwners: '588933434412498964',
-    mongoUri: process.env.MongoDB_URI
-  }).setDefaultPrefix('Spectron')
+    testServers: ["751683524171530331", "746313837049020517"],
+    botOwners: "588933434412498964",
+    mongoUri: process.env.MongoDB_URI,
+  })
+    .setDefaultPrefix("Spectron")
     .setColor(11553764);
 
   console.log(`${client.user!.tag} has logged in successfully.`);

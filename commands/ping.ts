@@ -10,14 +10,22 @@ export default {
     let int = interaction as unknown as Discord.CommandInteraction;
 
     let embed = new EmbedBuilder();
-    embed.setTitle('Pong! 🏓');
+    embed.setTitle("Pong! 🏓");
     embed.setColor(11553764);
-    embed.setFields([{ name: '🤖 Bot Latency', value: '\`\`\`Calculating...\`\`\`' }, { name: '💓 API Latency', value: '\`\`\`Calculating...\`\`\`' }]);
-    int.reply({ embeds: [embed], fetchReply: true }).then(async (resultMessage: any) => {
-      const ping = resultMessage.createdTimestamp - int.createdTimestamp;
-      embed.setFields([{ name: '🤖 Bot Latency', value: `\`\`\`${ping} ms\`\`\`` }, { name: '💓 API Latency', value: `\`\`\`${client.ws.ping} ms\`\`\`` }]);
-      embed.setTimestamp(int.createdTimestamp);
-      await int.editReply({ embeds: [embed] });
-    });
-  }
-} as ICommand
+    embed.setFields([
+      { name: "🤖 Bot Latency", value: "```Calculating...```" },
+      { name: "💓 API Latency", value: "```Calculating...```" },
+    ]);
+    int
+      .reply({ embeds: [embed], fetchReply: true })
+      .then(async (resultMessage: any) => {
+        const ping = resultMessage.createdTimestamp - int.createdTimestamp;
+        embed.setFields([
+          { name: "🤖 Bot Latency", value: `\`\`\`${ping} ms\`\`\`` },
+          { name: "💓 API Latency", value: `\`\`\`${client.ws.ping} ms\`\`\`` },
+        ]);
+        embed.setTimestamp(int.createdTimestamp);
+        await int.editReply({ embeds: [embed] });
+      });
+  },
+} as ICommand;
