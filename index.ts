@@ -11,7 +11,6 @@ import mongoose from "mongoose";
 import fetch from "cross-fetch";
 import FormData from "form-data";
 import fs from "fs";
-const download = require("download");
 const keepAlive = require("./server");
 
 const client = new Discord.Client({
