@@ -61,7 +61,7 @@ export default {
       const generatedTask = await wombo.generatePicture(
         `${query}`,
         32,
-        (taskInProgress) => { }
+        (taskInProgress) => {}
       );
 
       embed.setTitle(`${query}`);
