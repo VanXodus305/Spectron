@@ -26,7 +26,7 @@
     "ffmpeg-static": "^5.1.0",
     "form-data": "^4.0.0",
     "gimme-the-song": "^2.0.1",
-    "mongoose": "^6.6.3",
+    "mongoose": "^6.6.5",
     "sodium-native": "^3.4.1",
     "ts-node": "^10.9.1",
     "wokcommands": "^1.5.3",
