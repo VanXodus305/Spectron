@@ -3,8 +3,7 @@ node_modules
 .vscode
 sample.js
 sample.ts
-Deprecated Commands
+commands/Testing
 logs
-Test Commands
 test.ts
 .gitconfig
