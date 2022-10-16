@@ -1,6 +1,6 @@
 // import { Channel, Client, MessageEmbed } from 'discord.js';
 // import { text } from 'stream/consumers';
-// import welcomeSchema from '../models/welcome-schema';
+// import welcomeSchema from '../models/Testing/welcome-schema';
 
 //   // const welcomeData = {} as {
 //   //   [key: string]: [Channel, string]

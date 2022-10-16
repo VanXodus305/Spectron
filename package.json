@@ -25,7 +25,6 @@
     "express": "*",
     "ffmpeg-static": "*",
     "form-data": "*",
-    "gimme-the-song": "*",
     "mongoose": "*",
     "sodium-native": "*",
     "ts-node": "*",

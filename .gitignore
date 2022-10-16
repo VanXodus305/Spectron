@@ -4,6 +4,8 @@ node_modules
 sample.js
 sample.ts
 commands/Testing
+features/Testing
+models/Testing
 logs
 test.ts
 .gitconfig

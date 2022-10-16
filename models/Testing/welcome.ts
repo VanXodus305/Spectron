@@ -1,6 +1,6 @@
 // import Discord, { MessageEmbed, Guild } from "discord.js";
 // import { ICommand } from "wokcommands";
-// import welcomeSchema from '../models/welcome-schema';
+// import welcomeSchema from '../models/Testing/welcome-schema';
 
 // export default {
 //   category: 'Configuration',

@@ -27,7 +27,7 @@ client.once("ready", async () => {
     botOwners: "588933434412498964",
     mongoUri: process.env.MongoDB_URI,
   })
-    .setDefaultPrefix("Spectron")
+    .setDefaultPrefix("/")
     .setColor(11553764);
 
   console.log(`${client.user!.tag} has logged in successfully.`);
