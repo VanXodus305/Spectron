@@ -1,14 +1,12 @@
-import Discord, { EmbedBuilder } from "discord.js";
-import { ICommand } from "wokcommands";
+import { Client, CommandInteraction, EmbedBuilder, Interaction } from "discord.js";
+import { CommandObject, CommandType } from "wokcommands";
 
 export default {
-  category: "Info",
   description: "Provides the latency of the bot and the API",
-  slash: true,
   testOnly: false,
-  callback: async ({ client, interaction }) => {
-    let int = interaction as unknown as Discord.CommandInteraction;
-
+  type: CommandType.SLASH,
+  callback: async ({ client, interaction }: {client: Client, interaction: Interaction}) => {
+    let int = interaction as unknown as CommandInteraction;
     let embed = new EmbedBuilder();
     embed.setTitle("Pong! 🏓");
     embed.setColor(11553764);
@@ -28,4 +26,4 @@ export default {
         await int.editReply({ embeds: [embed] });
       });
   },
-} as ICommand;
+} as CommandObject;

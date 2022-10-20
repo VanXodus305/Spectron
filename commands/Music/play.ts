@@ -4,15 +4,15 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  Interaction,
 } from "discord.js";
 import {
-  AudioPlayerStatus,
   joinVoiceChannel,
-  demuxProbe,
   createAudioPlayer,
   createAudioResource,
+  NoSubscriberBehavior,
 } from "@discordjs/voice";
-import { ICommand } from "wokcommands";
+import { CommandObject, CommandType } from "wokcommands";
 import fetch from "cross-fetch";
 import { config } from "dotenv";
 config();
@@ -20,24 +20,17 @@ config();
 export default {
   category: "Music",
   description: "Search and Play music in a voice channel",
-  slash: true,
-  syntaxError: {
-    english: "**Incorrect syntax! Please use `{PREFIX}{COMMAND} {ARGUMENTS}`**",
-  },
+  type: CommandType.SLASH,
+  testOnly: false,
   options: [
     {
       name: "query",
       description: "The song to play or search for",
       required: true,
-      type: ApplicationCommandOptionType.String as unknown,
+      type: ApplicationCommandOptionType.String,
     },
   ],
-  maxArgs: 1,
-  minArgs: 1,
-  testOnly: false,
-  expectedArgs: "<query>",
-  aliases: ["join"],
-  callback: async ({ interaction }) => {
+  callback: async ({interaction}: {interaction: Interaction}) => {
     let int = interaction as any;
     const embed = new EmbedBuilder();
     if (int.member?.voice?.channel) {
@@ -45,12 +38,13 @@ export default {
       embed.setColor(11553764);
 
       await int.reply({ embeds: [embed] }).then(async () => {
-        await int.editReply({
-          embeds: [await searchSong(int.options.get("query")?.value as string)],
-        });
+        await int.editReply(
+          await searchSong(int.options.get("query")?.value as string)
+        );
       });
 
       async function searchSong(searchTerm: String) {
+        const row = new ActionRowBuilder();
         if (searchTerm.startsWith("http")) {
           if (searchTerm.includes("spotify")) {
             let spotifyID: String;
@@ -69,8 +63,8 @@ export default {
                       "Basic " +
                       btoa(
                         process.env.Spotify_Client_ID +
-                          ":" +
-                          process.env.Spotify_Client_Secret
+                        ":" +
+                        process.env.Spotify_Client_Secret
                       ),
                   },
                   body: "grant_type=client_credentials",
@@ -97,24 +91,25 @@ export default {
                 song.status == "SUCCESS" &&
                 song.results[0] &&
                 song.results[0]?.name.includes(spotifyTrack?.name) &&
-                song.results[0]?.artist.includes(spotifyTrack?.artists[0]?.name)
+                song.results[0]?.artist.includes(spotifyTrack?.artists[0]?.name) &&
+                song.results[0]?.downloadUrl != false
               ) {
                 await buildSong(song);
               } else {
                 embed.setTitle(
                   "❌ No streams were found for the provided song"
                 );
-                return embed;
+                return { embeds: [embed] };
               }
             }
           }
         } else {
           const saavnSong = await fetchSaavn(searchTerm);
-          if (saavnSong.status == "SUCCESS" && saavnSong.results[0]) {
+          if (saavnSong.status == "SUCCESS" && saavnSong.results[0] && saavnSong.results[0]?.downloadUrl != false) {
             await buildSong(saavnSong);
           } else {
             embed.setTitle("❌ No songs were found for the provided query");
-            return embed;
+            return { embeds: [embed] };
           }
         }
 
@@ -140,6 +135,7 @@ export default {
           const artists = song.results[0]?.artist;
           let duration = song.results[0]?.duration;
           duration = await convertTime(duration);
+
           async function convertTime(d: any) {
             d = Number(d);
             var h = Math.floor(d / 3600);
@@ -171,14 +167,30 @@ export default {
             value: "```\n" + duration + "```",
             inline: true,
           });
+
+          row.addComponents(
+            new ButtonBuilder()
+              .setLabel('STOP')
+              .setEmoji('⏹️')
+              .setCustomId('stop')
+              .setStyle(ButtonStyle.Danger)
+          );
         }
 
-        return embed;
+        if (row?.components[0]) {
+          return { embeds: [embed], components: [row] };
+        }
+        else {
+          return { embeds: [embed] }
+        }
       }
 
       async function playSong(song: any) {
-        const player = createAudioPlayer();
-
+        const player = createAudioPlayer({
+          behaviors: {
+            noSubscriber: NoSubscriberBehavior.Stop
+          },
+        });
         const connection = joinVoiceChannel({
           channelId: int.member?.voice?.channelId,
           guildId: int.guildId,
@@ -206,4 +218,4 @@ export default {
       int.reply({ embeds: [embed] });
     }
   },
-} as ICommand;
+} as CommandObject;

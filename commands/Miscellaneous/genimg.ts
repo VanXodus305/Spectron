@@ -1,35 +1,25 @@
 import Discord, {
   EmbedBuilder,
   ApplicationCommandOptionType,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
+  Interaction
 } from "discord.js";
-import { ICommand } from "wokcommands";
+import { CommandObject, CommandType } from "wokcommands";
 import { buildDefaultInstance } from "wombo-dream-api";
 
 export default {
-  category: "Utility",
   description: "Generates an image using AI based on the given prompt",
-  slash: true,
-  syntaxError: {
-    english: "**Incorrect syntax! Please use `{PREFIX}{COMMAND} {ARGUMENTS}`**",
-  },
+  type: CommandType.SLASH,
   options: [
     {
       name: "prompt",
       description: "The textual description of the image",
       required: true,
       maxLength: 100,
-      type: ApplicationCommandOptionType.String as unknown,
+      type: ApplicationCommandOptionType.String,
     },
   ],
-  maxArgs: 1,
-  minArgs: 1,
   testOnly: true,
-  expectedArgs: "<prompt>",
-  aliases: ["img"],
-  callback: async ({ interaction }) => {
+  callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as unknown as Discord.CommandInteraction;
 
     const embed = new EmbedBuilder();
@@ -61,12 +51,12 @@ export default {
       const generatedTask = await wombo.generatePicture(
         `${query}`,
         32,
-        (taskInProgress) => {}
+        (taskInProgress) => { }
       );
 
       embed.setTitle(`${query}`);
       embed.setImage(`${generatedTask.result?.final}`);
       return embed;
     }
-  },
-} as ICommand;
+  }
+} as CommandObject;

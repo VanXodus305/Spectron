@@ -1,11 +1,9 @@
 .env
 node_modules
 .vscode
-sample.js
 sample.ts
-commands/Testing
-features/Testing
-models/Testing
+sample.js
+Testing
 logs
 test.ts
 .gitconfig

@@ -1,40 +1,33 @@
 import fetch from "cross-fetch";
 import { AnimixPlay } from "animewizard";
-import Discord, {
+import {
   ActionRowBuilder,
   ButtonBuilder,
   EmbedBuilder,
   ButtonStyle,
   ApplicationCommandOptionType,
+  Client,
+  Message,
+  GuildMember,
 } from "discord.js";
 import { config } from "dotenv";
 config();
-import { ICommand } from "wokcommands";
+import { CommandObject, CommandType } from "wokcommands";
 
 export default {
-  category: "Utility",
-  expectedArgs: "<query>",
-  syntaxError: {
-    english: "**Incorrect syntax! Please use `{PREFIX}{COMMAND} {ARGUMENTS}`**",
-  },
-  minArgs: 1,
   options: [
     {
       name: "query",
       description: "Anime name or ID on MyAnimeList",
       required: true,
-      type: ApplicationCommandOptionType.String as unknown,
+      type: ApplicationCommandOptionType.String,
     },
   ],
   description: "Gives information about an anime from MyAnimeList",
-  slash: true,
+  type: CommandType.SLASH,
   testOnly: true,
-  callback: async ({ member, interaction, message, text, client }) => {
+  callback: async ({ member, interaction, message, client }: { member: GuildMember, interaction: any, message: Message, client: Client }) => {
     const msgEmbed = new EmbedBuilder();
-    if (message) {
-      message.channel.send(await search(text));
-    }
-
     if (interaction) {
       await interaction.deferReply({ fetchReply: true });
       await interaction.editReply(
@@ -312,4 +305,4 @@ export default {
       }
     });
   },
-} as ICommand;
+} as CommandObject;
