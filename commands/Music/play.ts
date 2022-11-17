@@ -22,10 +22,11 @@ export default {
   description: "Search and Play music in a voice channel",
   type: CommandType.SLASH,
   testOnly: false,
+  guildOnly: true,
   options: [
     {
       name: "query",
-      description: "The song to play or search for",
+      description: "The song(s) to play or search for",
       required: true,
       type: ApplicationCommandOptionType.String,
     },
@@ -85,7 +86,7 @@ export default {
               spotifyTrack = await spotifyTrack.json();
               searchTerm =
                 spotifyTrack?.name + " " + spotifyTrack?.artists[0]?.name;
-              const song = await fetchSaavn(searchTerm);
+              const song = await fetchSong(searchTerm);
 
               if (
                 song.status == "SUCCESS" &&
@@ -104,7 +105,7 @@ export default {
             }
           }
         } else {
-          const saavnSong = await fetchSaavn(searchTerm);
+          const saavnSong = await fetchSong(searchTerm);
           if (saavnSong.status == "SUCCESS" && saavnSong.results[0] && saavnSong.results[0]?.downloadUrl != false) {
             await buildSong(saavnSong);
           } else {
@@ -113,9 +114,9 @@ export default {
           }
         }
 
-        async function fetchSaavn(searchTerm: any) {
+        async function fetchSong(searchTerm: any) {
           const result: any = await fetch(
-            `https://saavn.me/search/songs?query=${searchTerm}&limit=1`,
+            `${process.env.Song_API_URL}/search/songs?query=${searchTerm}&limit=1`,
             {
               method: "GET",
               headers: {
@@ -213,7 +214,7 @@ export default {
     } else {
       embed.setColor(11553764);
       embed.setTitle(
-        "⚠️ You must be in a voice channel first to use this command"
+        "⚠️ You must be in a voice channel to use this command"
       );
       int.reply({ embeds: [embed] });
     }

@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import { AnimixPlay } from "animewizard";
+// import { AnimixPlay } from "animewizard";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -275,16 +275,16 @@ export default {
         }
       }
 
-      const animixPlay = new AnimixPlay();
-      let animes = await animixPlay.search(result.title);
-      if (animes[0]) {
-        row.addComponents(
-          new ButtonBuilder()
-            .setLabel("Watch on AnimixPlay")
-            .setStyle(ButtonStyle.Link)
-            .setURL(`https://animixplay.to${animes[0].url}`)
-        );
-      }
+      // const animixPlay = new AnimixPlay();
+      // let animes = await animixPlay.search(result.title);
+      // if (animes[0]) {
+      //   row.addComponents(
+      //     new ButtonBuilder()
+      //       .setLabel("Watch on AnimixPlay")
+      //       .setStyle(ButtonStyle.Link)
+      //       .setURL(`https://animixplay.to${animes[0].url}`)
+      //   );
+      // }
 
       if (row.components[0]) {
         return { embeds: [embed], components: [row] };
