@@ -16,7 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/opus": "*",
     "@discordjs/voice": "*",
     "cross-fetch": "*",
     "discord.js": "*",
@@ -25,6 +24,7 @@
     "ffmpeg-static": "*",
     "form-data": "*",
     "mongoose": "*",
+    "opusscript": "",
     "sodium-native": "*",
     "ts-node": "*",
     "wokcommands": "*",
