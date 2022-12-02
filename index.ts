@@ -17,9 +17,9 @@ client.on("ready", () => {
       DefaultCommands.CustomCommand,
       DefaultCommands.Prefix
     ],
-    events: {
-      dir: path.join(__dirname, "events"),
-    },
+    // events: {
+    //   dir: path.join(__dirname, "events"),
+    // },
     mongoUri: process.env.MongoDB_URI,
   });
   console.log(`${client.user!.tag} has logged in successfully.`);
