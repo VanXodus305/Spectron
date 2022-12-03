@@ -134,12 +134,12 @@ export default {
         }
 
         async function buildSong(song: any) {
-          const title = song.data.results[0]?.name;
+          const title = decodeURI(song.data.results[0]?.name);
           const id = song.data.results[0]?.id;
           const image =
             song.data.results[0]?.image[song.data.results[0]?.image?.length - 1]?.link;
-          const artists = song.data.results[0]?.primaryArtists;
-          let duration = song.data.results[0]?.duration;
+          const artists = decodeURI(song.data.results[0]?.primaryArtists);
+          let duration = decodeURI(song.data.results[0]?.duration);
           duration = await convertTime(duration);
 
           async function convertTime(d: any) {
