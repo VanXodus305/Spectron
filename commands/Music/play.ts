@@ -89,11 +89,11 @@ export default {
               const song = await fetchSong(searchTerm);
 
               if (
-                song.status == "SUCCESS" &&
-                song.results[0] &&
-                song.results[0]?.name.includes(spotifyTrack?.name) &&
-                song.results[0]?.artist.includes(spotifyTrack?.artists[0]?.name) &&
-                song.results[0]?.downloadUrl != false
+                song?.status == "SUCCESS" &&
+                song?.results[0] &&
+                song?.results[0]?.name.includes(spotifyTrack?.name) &&
+                song?.results[0]?.artist.includes(spotifyTrack?.artists[0]?.name) &&
+                song?.results[0]?.downloadUrl != false
               ) {
                 await buildSong(song);
               } else {
@@ -106,7 +106,7 @@ export default {
           }
         } else {
           const saavnSong = await fetchSong(searchTerm);
-          if (saavnSong.status == "SUCCESS" && saavnSong.results[0] && saavnSong.results[0]?.downloadUrl != false) {
+          if (saavnSong?.status == "SUCCESS" && saavnSong?.results[0] && saavnSong?.results[0]?.downloadUrl != false) {
             await buildSong(saavnSong);
           } else {
             embed.setTitle("❌ No songs were found for the provided query");
@@ -124,8 +124,13 @@ export default {
               },
             }
           );
-          const song = await result.json();
-          return song;
+          if (result.size != 0) {
+            const song = await result.json();
+            return song;
+          }
+          else {
+            return null;
+          }
         }
 
         async function buildSong(song: any) {
