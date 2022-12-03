@@ -90,10 +90,10 @@ export default {
 
               if (
                 song?.status == "SUCCESS" &&
-                song?.results[0] &&
-                song?.results[0]?.name.includes(spotifyTrack?.name) &&
-                song?.results[0]?.artist.includes(spotifyTrack?.artists[0]?.name) &&
-                song?.results[0]?.downloadUrl != false
+                song?.data?.results[0] &&
+                song?.data?.results[0]?.name.includes(spotifyTrack?.name) &&
+                song?.data?.results[0]?.primaryArtists.includes(spotifyTrack?.artists[0]?.name) &&
+                song?.data?.results[0]?.downloadUrl != false
               ) {
                 await buildSong(song);
               } else {
@@ -106,7 +106,7 @@ export default {
           }
         } else {
           const saavnSong = await fetchSong(searchTerm);
-          if (saavnSong?.status == "SUCCESS" && saavnSong?.results[0] && saavnSong?.results[0]?.downloadUrl != false) {
+          if (saavnSong?.status == "SUCCESS" && saavnSong?.data?.results[0] && saavnSong?.data?.results[0]?.downloadUrl != false) {
             await buildSong(saavnSong);
           } else {
             embed.setTitle("❌ No songs were found for the provided query");
@@ -124,7 +124,7 @@ export default {
               },
             }
           );
-          if (result.size != 0) {
+          if (result.status == 200) {
             const song = await result.json();
             return song;
           }
@@ -134,12 +134,12 @@ export default {
         }
 
         async function buildSong(song: any) {
-          const title = song.results[0]?.name;
-          const id = song.results[0]?.id;
+          const title = song.data.results[0]?.name;
+          const id = song.data.results[0]?.id;
           const image =
-            song.results[0]?.image[song.results[0]?.image?.length - 1]?.link;
-          const artists = song.results[0]?.artist;
-          let duration = song.results[0]?.duration;
+            song.data.results[0]?.image[song.data.results[0]?.image?.length - 1]?.link;
+          const artists = song.data.results[0]?.primaryArtists;
+          let duration = song.data.results[0]?.duration;
           duration = await convertTime(duration);
 
           async function convertTime(d: any) {
@@ -165,7 +165,7 @@ export default {
           });
           embed.addFields({
             name: "Album",
-            value: "```\n" + song.results[0]?.album?.name + "```",
+            value: "```\n" + song.data.results[0]?.album?.name + "```",
             inline: true,
           });
           embed.addFields({
@@ -206,11 +206,11 @@ export default {
         connection.subscribe(player);
 
         let resource = createAudioResource(
-          song.results[0]?.downloadUrl[song.results[0]?.downloadUrl?.length - 1]
+          song.data.results[0]?.downloadUrl[song.data.results[0]?.downloadUrl?.length - 1]
             ?.link,
           {
             metadata: {
-              title: song.results[0]?.name,
+              title: song.data.results[0]?.name,
             },
           }
         );
