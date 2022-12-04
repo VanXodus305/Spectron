@@ -102,11 +102,8 @@ export default {
                 }
               );
               spotifyTrack = await spotifyTrack.json();
-              console.log(spotifyTrack);
-              searchTerm =
-                spotifyTrack?.name + " " + spotifyTrack?.artists[0]?.name;
+              searchTerm = spotifyTrack?.name + " " + spotifyTrack?.artists[0]?.name;
               const song = await fetchSong(searchTerm);
-              console.log(song.data);
 
               if (
                 song?.status == "SUCCESS" &&
