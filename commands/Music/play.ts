@@ -102,14 +102,16 @@ export default {
                 }
               );
               spotifyTrack = await spotifyTrack.json();
+              console.log(spotifyTrack);
               searchTerm =
                 spotifyTrack?.name + " " + spotifyTrack?.artists[0]?.name;
               const song = await fetchSong(searchTerm);
+              console.log(song.data);
 
               if (
                 song?.status == "SUCCESS" &&
                 song?.data?.results[0] &&
-                song?.data?.results[0]?.duration == Math.round(spotifyTrack?.duration_ms / 1000) &&
+                song?.data?.results[0]?.duration == Math.floor(spotifyTrack?.duration_ms / 1000) &&
                 song?.data?.results[0]?.downloadUrl != false
               ) {
                 await buildSong(song);
