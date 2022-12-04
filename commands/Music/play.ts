@@ -44,6 +44,24 @@ export default {
         );
       });
 
+      function decodeHTMLEntities(text: string) {
+        var entities = [
+          ['amp', '&'],
+          ['apos', '\''],
+          ['#x27', '\''],
+          ['#x2F', '/'],
+          ['#39', '\''],
+          ['#47', '/'],
+          ['lt', '<'],
+          ['gt', '>'],
+          ['nbsp', ' '],
+          ['quot', '"']
+        ];
+        for (var i = 0, max = entities.length; i < max; ++i)
+          text = text.replace(new RegExp('&' + entities[i][0] + ';', 'g'), entities[i][1]);
+        return text;
+      }
+
       async function searchSong(searchTerm: String) {
         const row = new ActionRowBuilder();
         if (searchTerm.startsWith("http")) {
@@ -134,12 +152,12 @@ export default {
         }
 
         async function buildSong(song: any) {
-          const title = decodeURI(song.data.results[0]?.name);
+          const title = decodeHTMLEntities(song.data.results[0]?.name);
           const id = song.data.results[0]?.id;
           const image =
             song.data.results[0]?.image[song.data.results[0]?.image?.length - 1]?.link;
-          const artists = decodeURI(song.data.results[0]?.primaryArtists);
-          let duration = decodeURI(song.data.results[0]?.duration);
+          const artists = decodeHTMLEntities(song.data.results[0]?.primaryArtists);
+          let duration = decodeHTMLEntities(song.data.results[0]?.duration);
           duration = await convertTime(duration);
 
           async function convertTime(d: any) {
