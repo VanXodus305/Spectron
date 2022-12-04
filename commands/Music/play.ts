@@ -31,7 +31,7 @@ export default {
       type: ApplicationCommandOptionType.String,
     },
   ],
-  callback: async ({interaction}: {interaction: Interaction}) => {
+  callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
     const embed = new EmbedBuilder();
     if (int.member?.voice?.channel) {
@@ -109,8 +109,7 @@ export default {
               if (
                 song?.status == "SUCCESS" &&
                 song?.data?.results[0] &&
-                song?.data?.results[0]?.name.includes(spotifyTrack?.name) &&
-                song?.data?.results[0]?.primaryArtists.includes(spotifyTrack?.artists[0]?.name) &&
+                song?.data?.results[0]?.duration == Math.round(spotifyTrack?.duration_ms / 1000) &&
                 song?.data?.results[0]?.downloadUrl != false
               ) {
                 await buildSong(song);
