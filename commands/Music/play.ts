@@ -46,19 +46,22 @@ export default {
 
       function decodeHTMLEntities(text: string) {
         var entities = [
-          ['amp', '&'],
-          ['apos', '\''],
-          ['#x27', '\''],
-          ['#x2F', '/'],
-          ['#39', '\''],
-          ['#47', '/'],
-          ['lt', '<'],
-          ['gt', '>'],
-          ['nbsp', ' '],
-          ['quot', '"']
+          ["amp", "&"],
+          ["apos", "'"],
+          ["#x27", "'"],
+          ["#x2F", "/"],
+          ["#39", "'"],
+          ["#47", "/"],
+          ["lt", "<"],
+          ["gt", ">"],
+          ["nbsp", " "],
+          ["quot", '"'],
         ];
         for (var i = 0, max = entities.length; i < max; ++i)
-          text = text.replace(new RegExp('&' + entities[i][0] + ';', 'g'), entities[i][1]);
+          text = text.replace(
+            new RegExp("&" + entities[i][0] + ";", "g"),
+            entities[i][1]
+          );
         return text;
       }
 
@@ -102,16 +105,35 @@ export default {
                 }
               );
               spotifyTrack = await spotifyTrack.json();
-              searchTerm = spotifyTrack?.name + " " + spotifyTrack?.artists[0]?.name;
-              const song = await fetchSong(searchTerm);
+              let spotifyArtists = "";
+              spotifyTrack?.artists?.forEach(
+                (artist: any) => (spotifyArtists += " " + artist.name)
+              );
+              searchTerm =
+                spotifyTrack?.name.replace(/\([^()]*\)/g, "") + spotifyArtists;
+              searchTerm = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "");
+              let songs = await fetchSong(searchTerm, 10);
 
-              if (
-                song?.status == "SUCCESS" &&
-                song?.data?.results[0] &&
-                song?.data?.results[0]?.duration == Math.floor(spotifyTrack?.duration_ms / 1000) &&
-                song?.data?.results[0]?.downloadUrl != false
-              ) {
-                await buildSong(song);
+              if (songs?.status == "SUCCESS" && songs?.data?.results[0]) {
+                songs = await songs?.data?.results?.sort((a: any, b: any) => {
+                  return a.name.localeCompare(b.name);
+                });
+                const song = await songs.find((song: any) => {
+                  return (
+                    song.duration -
+                    Math.abs(Math.floor(spotifyTrack?.duration_ms / 1000)) <=
+                    2 && song.downloadUrl != false
+                  );
+                });
+
+                if (song != undefined) {
+                  await buildSong(song);
+                } else {
+                  embed.setTitle(
+                    "❌ No streams were found for the provided song"
+                  );
+                  return { embeds: [embed] };
+                }
               } else {
                 embed.setTitle(
                   "❌ No streams were found for the provided song"
@@ -121,18 +143,22 @@ export default {
             }
           }
         } else {
-          const saavnSong = await fetchSong(searchTerm);
-          if (saavnSong?.status == "SUCCESS" && saavnSong?.data?.results[0] && saavnSong?.data?.results[0]?.downloadUrl != false) {
-            await buildSong(saavnSong);
+          const saavnSong = await fetchSong(searchTerm, 1);
+          if (
+            saavnSong?.status == "SUCCESS" &&
+            saavnSong?.data?.results[0] &&
+            saavnSong?.data?.results[0]?.downloadUrl != false
+          ) {
+            await buildSong(saavnSong.data.results[0]);
           } else {
             embed.setTitle("❌ No songs were found for the provided query");
             return { embeds: [embed] };
           }
         }
 
-        async function fetchSong(searchTerm: any) {
+        async function fetchSong(searchTerm: any, limit: Number) {
           const result: any = await fetch(
-            `${process.env.Song_API_URL}/search/songs?query=${searchTerm}&limit=1`,
+            `${process.env.Song_API_URL}/search/songs?query=${searchTerm}&limit=${limit}`,
             {
               method: "GET",
               headers: {
@@ -143,19 +169,17 @@ export default {
           if (result.status == 200) {
             const song = await result.json();
             return song;
-          }
-          else {
+          } else {
             return null;
           }
         }
 
         async function buildSong(song: any) {
-          const title = decodeHTMLEntities(song.data.results[0]?.name);
-          const id = song.data.results[0]?.id;
-          const image =
-            song.data.results[0]?.image[song.data.results[0]?.image?.length - 1]?.link;
-          const artists = decodeHTMLEntities(song.data.results[0]?.primaryArtists);
-          let duration = decodeHTMLEntities(song.data.results[0]?.duration);
+          const title = decodeHTMLEntities(song.name);
+          const id = song.id;
+          const image = song.image[song.image?.length - 1]?.link;
+          const artists = decodeHTMLEntities(song.primaryArtists);
+          let duration = decodeHTMLEntities(song.duration);
           duration = await convertTime(duration);
 
           async function convertTime(d: any) {
@@ -181,7 +205,7 @@ export default {
           });
           embed.addFields({
             name: "Album",
-            value: "```\n" + song.data.results[0]?.album?.name + "```",
+            value: "```\n" + song.album?.name + "```",
             inline: true,
           });
           embed.addFields({
@@ -192,25 +216,24 @@ export default {
 
           row.addComponents(
             new ButtonBuilder()
-              .setLabel('STOP')
-              .setEmoji('⏹️')
-              .setCustomId('stop')
+              .setLabel("STOP")
+              .setEmoji("⏹️")
+              .setCustomId("stop")
               .setStyle(ButtonStyle.Danger)
           );
         }
 
         if (row?.components[0]) {
           return { embeds: [embed], components: [row] };
-        }
-        else {
-          return { embeds: [embed] }
+        } else {
+          return { embeds: [embed] };
         }
       }
 
       async function playSong(song: any) {
         const player = createAudioPlayer({
           behaviors: {
-            noSubscriber: NoSubscriberBehavior.Stop
+            noSubscriber: NoSubscriberBehavior.Stop,
           },
         });
         const connection = joinVoiceChannel({
@@ -222,11 +245,10 @@ export default {
         connection.subscribe(player);
 
         let resource = createAudioResource(
-          song.data.results[0]?.downloadUrl[song.data.results[0]?.downloadUrl?.length - 1]
-            ?.link,
+          song.downloadUrl[song.downloadUrl?.length - 1]?.link,
           {
             metadata: {
-              title: song.data.results[0]?.name,
+              title: song.name,
             },
           }
         );
@@ -234,9 +256,7 @@ export default {
       }
     } else {
       embed.setColor(11553764);
-      embed.setTitle(
-        "⚠️ You must be in a voice channel to use this command"
-      );
+      embed.setTitle("⚠️ You must be in a voice channel to use this command");
       int.reply({ embeds: [embed] });
     }
   },
