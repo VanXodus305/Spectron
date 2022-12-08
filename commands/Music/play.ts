@@ -109,8 +109,13 @@ export default {
               spotifyTrack?.artists?.forEach(
                 (artist: any) => (spotifyArtists += " " + artist.name)
               );
-              searchTerm =
-                spotifyTrack?.name.replace(/\([^()]*\)/g, "") + spotifyArtists;
+              if (spotifyTrack?.name.toLowerCase().includes('remix')) {
+                searchTerm = spotifyTrack?.name.replace('(', '').replace(')', '');
+              }
+              else {
+                searchTerm =
+                  spotifyTrack?.name.replace(/\([^()]*\)/g, "") + spotifyArtists;
+              }
               searchTerm = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "");
               let songs = await fetchSong(searchTerm, 10);
 
@@ -205,7 +210,7 @@ export default {
           });
           embed.addFields({
             name: "Album",
-            value: "```\n" + song.album?.name + "```",
+            value: "```\n" + decodeHTMLEntities(song.album?.name) + "```",
             inline: true,
           });
           embed.addFields({
