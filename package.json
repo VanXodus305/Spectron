@@ -18,16 +18,20 @@
   "dependencies": {
     "@discordjs/opus": "*",
     "@discordjs/voice": "*",
+    "bufferutil": "*",
     "cross-fetch": "*",
     "discord.js": "*",
     "dotenv": "*",
+    "erlpack": "github:discord/erlpack",
     "express": "*",
     "ffmpeg-static": "*",
     "form-data": "*",
     "mongoose": "*",
     "sodium-native": "*",
     "ts-node": "*",
+    "utf-8-validate": "*",
     "wokcommands": "*",
-    "wombo-dream-api": "*"
+    "wombo-dream-api": "*",
+    "zlib-sync": "*"
   }
 }
