@@ -26,12 +26,10 @@
     "express": "*",
     "ffmpeg-static": "*",
     "form-data": "*",
-    "mongoose": "*",
     "sodium-native": "*",
     "ts-node": "*",
     "utf-8-validate": "*",
     "wokcommands": "*",
-    "wombo-dream-api": "*",
     "zlib-sync": "*"
   }
 }
