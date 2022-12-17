@@ -1,40 +1,40 @@
-// import { ActionRowBuilder, EmbedBuilder } from 'discord.js';
-// import { getVoiceConnection } from '@discordjs/voice';
-// import WOK from "wokcommands";
+import { VoiceState } from "discord.js";
+import WOK from "wokcommands";
+import { getVoiceConnection } from "@discordjs/voice";
 
-// export default (instance: WOK) => {
+export default async (oldState: VoiceState, newState: VoiceState, instance: WOK) => {
+  try {
+    if (newState.id == newState.guild.members.me?.id) return;
 
-//   // Stage Channel self suspress
-//   if (newState.id == client.user.id && newState.channelId && newState.channel.type == "GUILD_STAGE_VOICE" && newState.suppress) {
-//     if (newState.channel?.permissionsFor(newState.guild.me)?.has(Permissions.FLAGS.MUTE_MEMBERS)) {
-//       await newState.guild.me.voice.setSuppressed(false).catch(() => null);
-//     }
-//   }
+    function stateChange(one: boolean | null, two: boolean | null) {
+      if (one === false && two === true || one === true && two === false) return true;
+      else return false;
+    }
+    const o = oldState, n = newState;
+    if (stateChange(o.streaming, n.streaming) ||
+      stateChange(o.serverDeaf, n.serverDeaf) ||
+      stateChange(o.serverMute, n.serverMute) ||
+      stateChange(o.selfDeaf, n.selfDeaf) ||
+      stateChange(o.selfMute, n.selfMute) ||
+      stateChange(o.selfVideo, n.selfVideo) ||
+      stateChange(o.suppress, n.suppress)) return;
 
-//   if (newState.id == client.user.id) return;
+    if (!o.channelId && n.channelId) {
+      return;
+    }
 
-//   // Destroy connection if channel gets emtpy
-//   function stateChange(one, two) {
-//     if (one === false && two === true || one === true && two === false) return true;
-//     else return false;
-//   }
-//   const o = oldState, n = newState;
-//   if (stateChange(o.streaming, n.streaming) ||
-//     stateChange(o.serverDeaf, n.serverDeaf) ||
-//     stateChange(o.serverMute, n.serverMute) ||
-//     stateChange(o.selfDeaf, n.selfDeaf) ||
-//     stateChange(o.selfMute, n.selfMute) ||
-//     stateChange(o.selfVideo, n.selfVideo) ||
-//     stateChange(o.suppress, n.suppress)) return;
-//   // channel joins
-//   if (!o.channelId && n.channelId) {
-//     return;
-//   }
-//   // channel leaves
-//   if (!n.channelId && o.channelId || n.channelId && o.channelId) {
-//     const connection = getVoiceConnection(n.guild.id);
-//     if (o.channel.members.filter(m => !m.user.bot && !m.voice.selfDeaf && !m.voice.serverDeaf).size >= 1) return;
-//     if (connection && connection.joinConfig.channelId == o.channelId) connection.destroy();
-//     return;
-//   }
-// }
+    if (!n.channelId && o.channelId || n.channelId && o.channelId) {
+      const connection = getVoiceConnection(n.guild.id);
+      if (o.channel?.members.filter(m => !m.user.bot).size as any >= 1) return;
+      if (connection && connection.joinConfig.channelId == o.channelId) {
+        setTimeout(() => {
+          connection.destroy();
+        }, 30 * 1000);
+      }
+      return;
+    }
+  }
+  catch (error) {
+    console.error(error);
+  }
+}

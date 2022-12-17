@@ -1,11 +1,15 @@
-import { Client } from "discord.js";
+import { Client, Collection } from "discord.js";
 import WOK, { DefaultCommands } from "wokcommands";
 import path from "path";
 require("dotenv/config");
 
-const client = new Client({
-  intents: ["Guilds", "GuildMessages", "MessageContent", "GuildVoiceStates"],
+const client: any = new Client({
+  intents: ["Guilds", "GuildMessages", "GuildMembers", "GuildVoiceStates"],
+  failIfNotExists: false,
+  shards: "auto"
 });
+
+client.queues = new Collection();
 
 client.on("ready", () => {
   new WOK({
@@ -17,9 +21,9 @@ client.on("ready", () => {
       DefaultCommands.CustomCommand,
       DefaultCommands.Prefix
     ],
-    // events: {
-    //   dir: path.join(__dirname, "events"),
-    // },
+    events: {
+      dir: path.join(__dirname, "events"),
+    },
     mongoUri: process.env.MongoDB_URI,
   });
   console.log(`${client.user!.tag} has logged in successfully.`);
