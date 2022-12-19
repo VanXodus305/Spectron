@@ -34,7 +34,7 @@ export default {
         embeds: [
           new EmbedBuilder()
             .setColor(11553764)
-            .setTitle("❌ Something went wrong while executing that command")
+            .setDescription("**❌ Something went wrong while executing that command**")
         ],
       }).catch(() => null);
     }

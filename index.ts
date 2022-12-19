@@ -9,6 +9,8 @@ const client: any = new Client({
   shards: "auto"
 });
 
+// require ("./util/music.ts")(client);
+
 client.queues = new Collection();
 
 client.on("ready", () => {

@@ -261,7 +261,7 @@ export default {
       }
     } else {
       embed.setColor(11553764);
-      embed.setTitle("⚠️ You must be in a voice channel to use this command");
+      embed.setTitle("⚠️ You must be in a Voice/Stage Channel to use this command");
       int.reply({ embeds: [embed] });
     }
   },
