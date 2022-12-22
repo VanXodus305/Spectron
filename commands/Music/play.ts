@@ -28,6 +28,8 @@ export default {
   ],
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
+    int.client.lastInt = int;
+    
     if (!int.member?.voice?.channel) {
       return await int.reply({
         embeds: [

@@ -1,4 +1,4 @@
-import { VoiceState } from "discord.js";
+import { EmbedBuilder, GuildMember, VoiceState } from "discord.js";
 import WOK from "wokcommands";
 import { getVoiceConnection } from "@discordjs/voice";
 
@@ -10,7 +10,7 @@ export default async (oldState: VoiceState, newState: VoiceState, instance: WOK)
       if (one === false && two === true || one === true && two === false) return true;
       else return false;
     }
-    const o = oldState, n = newState;
+    const o = oldState as any, n = newState as any;
     if (stateChange(o.streaming, n.streaming) ||
       stateChange(o.serverDeaf, n.serverDeaf) ||
       stateChange(o.serverMute, n.serverMute) ||
@@ -24,11 +24,18 @@ export default async (oldState: VoiceState, newState: VoiceState, instance: WOK)
     }
 
     if (!n.channelId && o.channelId || n.channelId && o.channelId) {
-      setTimeout(() => {
+      setTimeout(async () => {
         const connection = getVoiceConnection(n.guild.id);
-        if (o.channel?.members.filter(m => !m.user.bot).size as any >= 1) return;
+        if (o.channel?.members.filter((m: GuildMember) => !m.user.bot).size as any >= 1) return;
         if (connection && connection.joinConfig.channelId == o.channelId) {
           connection.destroy();
+          await o.client.lastInt?.followUp({
+            embeds: [
+              new EmbedBuilder()
+                .setColor(11553764)
+                .setDescription(`**👋 Left <#${connection.joinConfig.channelId}> due to inactivity**`)
+            ]
+          }).catch(() => null);
         }
       }, 30 * 1000);
       return;

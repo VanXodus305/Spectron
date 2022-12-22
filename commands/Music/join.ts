@@ -1,5 +1,5 @@
 import { getVoiceConnection } from "@discordjs/voice";
-import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, Interaction } from "discord.js";
+import { ChannelType, EmbedBuilder, Interaction } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 
 export default {
@@ -9,6 +9,8 @@ export default {
   guildOnly: true,
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
+    int.client.lastInt = int;
+     
     try {
       if (!int.member?.voice?.channel) {
         return await int.reply({

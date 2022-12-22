@@ -1,4 +1,4 @@
-import { Client, Collection } from "discord.js";
+import { Client, Collection, CommandInteraction } from "discord.js";
 import WOK, { DefaultCommands } from "wokcommands";
 import path from "path";
 require("dotenv/config");
@@ -9,10 +9,9 @@ const client: any = new Client({
   shards: "auto"
 });
 
-// require ("./util/music.ts")(client);
-
 client.queues = new Collection();
 client.int = [];
+client.lastInt as CommandInteraction;
 
 client.on("ready", () => {
   new WOK({

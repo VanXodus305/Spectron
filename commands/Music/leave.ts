@@ -1,5 +1,5 @@
 import { getVoiceConnection } from "@discordjs/voice";
-import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, Interaction } from "discord.js";
+import { ChannelType, EmbedBuilder, Interaction } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 
 export default {

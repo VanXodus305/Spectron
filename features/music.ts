@@ -4,18 +4,18 @@ import fetch from "cross-fetch";
 import WOK from 'wokcommands';
 
 export default async (instance: WOK, client: any) => {
-  const m2 = (t: any) => {
-    return parseInt(t) < 10 ? `0${t}` : `${t}`
-  }
-  const m3 = (t: any) => {
-    return parseInt(t) < 100 ? `0${m2(t)}` : `${t}`
-  }
+  // const m2 = (t: any) => {
+  //   return parseInt(t) < 10 ? `0${t}` : `${t}`
+  // }
+  // const m3 = (t: any) => {
+  //   return parseInt(t) < 100 ? `0${m2(t)}` : `${t}`
+  // }
 
 
-  client.getTime = () => {
-    const d = new Date;
-    return `${m2(d.getHours())}:${m2(d.getMinutes())}:${m2(d.getSeconds())}.${m3(d.getMilliseconds())}`
-  }
+  // client.getTime = () => {
+  //   const d = new Date;
+  //   return `${m2(d.getHours())}:${m2(d.getMinutes())}:${m2(d.getSeconds())}.${m3(d.getMilliseconds())}`
+  // }
 
   client.getSong = async (query: string) => {
     try {
