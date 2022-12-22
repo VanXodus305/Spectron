@@ -1,9 +1,9 @@
 import { getVoiceConnection } from "@discordjs/voice";
-import { ChannelType, EmbedBuilder, Interaction } from "discord.js";
+import { EmbedBuilder, Interaction } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 
 export default {
-  description: "Stops playing music and leaves a Voice/Stage Channel",
+  description: "Stops Playing Music and Leaves a Voice/Stage Channel",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,

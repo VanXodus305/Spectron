@@ -14,7 +14,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Search and Play music in a voice channel",
+  description: "Search and Play Music in a Voice/Stage Channel",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,

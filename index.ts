@@ -1,4 +1,4 @@
-import { Client, Collection, CommandInteraction } from "discord.js";
+import { Client } from "discord.js";
 import WOK, { DefaultCommands } from "wokcommands";
 import path from "path";
 require("dotenv/config");
@@ -8,10 +8,6 @@ const client: any = new Client({
   failIfNotExists: false,
   shards: "auto"
 });
-
-client.queues = new Collection();
-client.int = [];
-client.lastInt as CommandInteraction;
 
 client.on("ready", () => {
   new WOK({

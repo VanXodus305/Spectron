@@ -66,7 +66,7 @@ export default async (instance: WOK, client: any) => {
         adapterCreator: channel.guild.voiceAdapterCreator
       });
 
-      await delay(250);
+      await client.delay(250);
 
       newConnection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
         try {
@@ -99,7 +99,7 @@ export default async (instance: WOK, client: any) => {
       if (oldConnection) {
         try {
           oldConnection.destroy();
-          await delay(250);
+          await client.delay(250);
           return res(true);
         } catch (e) {
           console.error(e);
@@ -274,7 +274,7 @@ export default async (instance: WOK, client: any) => {
       client.int.shift();
     }
     else {
-      const msg = await client.int[0].fetchReply().catch(() => null); 
+      const msg = await client.int[0].fetchReply().catch(() => null);
       msg?.edit({
         embeds: [
           songEmbed
@@ -292,25 +292,13 @@ export default async (instance: WOK, client: any) => {
     return {
       textChannel: channelId,
       paused: false,
-      skipped: false,      
+      skipped: false,
       trackloop: false,
-      queueloop: false,     
+      queueloop: false,
       tracks: [client.createSong(song, user)],
       previous: undefined,
       creator: user,
     }
-  }
-
-  client.formatDuration = (d: number) => {
-    d = Number(d);
-    var h = Math.floor(d / 3600);
-    var m = Math.floor((d % 3600) / 60);
-    var s = Math.floor((d % 3600) % 60);
-
-    var hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours ") : "";
-    var mDisplay = m > 0 ? m + (m == 1 ? " minute " : " minutes ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-    return hDisplay + mDisplay + sDisplay;
   }
 
   client.createBar = (duration: number, position: number) => {
@@ -325,30 +313,5 @@ export default async (instance: WOK, client: any) => {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  client.decodeHTMLEntities = (text: string) => {
-    var entities = [
-      ["amp", "&"],
-      ["apos", "'"],
-      ["#x27", "'"],
-      ["#x2F", "/"],
-      ["#39", "'"],
-      ["#47", "/"],
-      ["lt", "<"],
-      ["gt", ">"],
-      ["nbsp", " "],
-      ["quot", '"'],
-    ];
-    for (var i = 0, max = entities.length; i < max; ++i)
-      text = text.replace(
-        new RegExp("&" + entities[i][0] + ";", "g"),
-        entities[i][1]
-      );
-    return text;
-  }
-
-  function delay(ms: number) {
-    return new Promise(r => setTimeout(() => r(2), ms));
   }
 }
