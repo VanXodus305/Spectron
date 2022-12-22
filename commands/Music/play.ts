@@ -1,19 +1,14 @@
 import {
   EmbedBuilder,
   ApplicationCommandOptionType,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   Interaction,
+  ChannelType,
+  Message,
 } from "discord.js";
 import {
-  joinVoiceChannel,
-  createAudioPlayer,
-  createAudioResource,
-  NoSubscriberBehavior,
+  getVoiceConnection,
 } from "@discordjs/voice";
 import { CommandObject, CommandType } from "wokcommands";
-import fetch from "cross-fetch";
 import { config } from "dotenv";
 config();
 
@@ -26,243 +21,163 @@ export default {
   options: [
     {
       name: "query",
-      description: "The song(s) to play or search for",
+      description: "The song to search for and play",
       required: true,
       type: ApplicationCommandOptionType.String,
     },
   ],
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
-    const embed = new EmbedBuilder();
-    if (int.member?.voice?.channel) {
-      embed.setTitle("🔍 Searching for song...");
-      embed.setColor(11553764);
+    if (!int.member?.voice?.channel) {
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription('**⚠️ You must be in a Voice/Stage Channel to use this command**')
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
+    }
 
-      await int.reply({ embeds: [embed] }).then(async () => {
-        await int.editReply(
-          await searchSong(int.options.get("query")?.value as string)
-        );
-      });
+    const oldConnection = getVoiceConnection(int.guild.id);
 
-      function decodeHTMLEntities(text: string) {
-        var entities = [
-          ["amp", "&"],
-          ["apos", "'"],
-          ["#x27", "'"],
-          ["#x2F", "/"],
-          ["#39", "'"],
-          ["#47", "/"],
-          ["lt", "<"],
-          ["gt", ">"],
-          ["nbsp", " "],
-          ["quot", '"'],
-        ];
-        for (var i = 0, max = entities.length; i < max; ++i)
-          text = text.replace(
-            new RegExp("&" + entities[i][0] + ";", "g"),
-            entities[i][1]
-          );
-        return text;
+    if (oldConnection && oldConnection.joinConfig.channelId != int.member.voice?.channelId) {
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**⚠️ I'm already connected in <#${oldConnection.joinConfig.channelId}>**`)
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
+    }
+
+    if (int.member.voice.channel?.type == ChannelType.GuildStageVoice && !int.member.voice.channel?.permissionsFor(int.guild?.members?.me)?.has('RequestToSpeak')) {
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**⚠️ I need the \`Request to Speak\` permission in <#${int.member?.voice?.channel?.id}>**`)
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
+    }
+
+    if (int.member.voice.channel?.type == ChannelType.GuildStageVoice && !int.member.voice.channel?.permissionsFor(int.guild?.members?.me)?.has('MuteMembers')) {
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**⚠️ I need the \`Mute Members\` permission in <#${int.member?.voice?.channel?.id}>**`)
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
+    }
+
+    if (!int.member.voice.channel?.permissionsFor(int.guild?.members?.me)?.has('Connect')) {
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**⚠️ I need the \`Connect\` permission in <#${int.member?.voice?.channel?.id}>**`)
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
+    }
+
+    if (!int.member.voice.channel?.permissionsFor(int.guild?.members?.me)?.has('Speak')) {
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**⚠️ I need the \`Speak\` permission in <#${int.member?.voice?.channel?.id}>**`)
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
+    }
+
+    let song: any = null;
+
+    if (!oldConnection) {
+      try {
+        await int.client.joinVoiceChannel(int.member.voice?.channel);
+      } catch (e) {
+        console.error(e);
+        return await int.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setDescription(`**❌ Could not join <#${int.member?.voice?.channel?.id}>**`)
+              .setColor(11553764)
+          ],
+          ephemeral: true
+        }).catch(() => null);
+      }
+    }
+    try {
+      const m: Message = await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**🔍 Searching for \`${int.options?.get("query")?.value}\`**`)
+            .setColor(11553764)
+        ],
+        fetchReply: true
+      }).catch(() => null);
+
+      let queue = int.client.queues.get(int.guild.id);
+      if (!oldConnection && queue) {
+        int.client.queues.delete(int.guild.id);
+        queue = undefined;
       }
 
-      async function searchSong(searchTerm: String) {
-        const row = new ActionRowBuilder();
-        if (searchTerm.startsWith("http")) {
-          if (searchTerm.includes("spotify")) {
-            let spotifyID: String;
-            if (searchTerm.includes("track")) {
-              spotifyID = searchTerm.substring(
-                searchTerm.indexOf("track") + 6,
-                searchTerm.indexOf("track") + 28
-              );
-              let spotifyToken: any = await fetch(
-                "https://accounts.spotify.com/api/token",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    Authorization:
-                      "Basic " +
-                      btoa(
-                        process.env.Spotify_Client_ID +
-                        ":" +
-                        process.env.Spotify_Client_Secret
-                      ),
-                  },
-                  body: "grant_type=client_credentials",
-                }
-              );
-              spotifyToken = await spotifyToken.json();
-              spotifyToken = spotifyToken.access_token;
-
-              let spotifyTrack: any = await fetch(
-                `https://api.spotify.com/v1/tracks/${spotifyID}`,
-                {
-                  method: "GET",
-                  headers: {
-                    Authorization: "Bearer " + spotifyToken,
-                  },
-                }
-              );
-              spotifyTrack = await spotifyTrack.json();
-              let spotifyArtists = "";
-              spotifyTrack?.artists?.forEach(
-                (artist: any) => (spotifyArtists += " " + artist.name)
-              );
-              if (spotifyTrack?.name.toLowerCase().includes('remix')) {
-                searchTerm = spotifyTrack?.name.replace('(', '').replace(')', '');
-              }
-              else {
-                searchTerm =
-                  spotifyTrack?.name.replace(/\([^()]*\)/g, "") + spotifyArtists;
-              }
-              searchTerm = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "");
-              let songs = await fetchSong(searchTerm, 10);
-
-              if (songs?.status == "SUCCESS" && songs?.data?.results[0]) {
-                songs = await songs?.data?.results?.sort((a: any, b: any) => {
-                  return a.name.localeCompare(b.name);
-                });
-                const song = await songs.find((song: any) => {
-                  return (
-                    song.duration -
-                    Math.abs(Math.floor(spotifyTrack?.duration_ms / 1000)) <=
-                    2 && song.downloadUrl != false
-                  );
-                });
-
-                if (song != undefined) {
-                  await buildSong(song);
-                } else {
-                  embed.setTitle(
-                    "❌ No streams were found for the provided song"
-                  );
-                  return { embeds: [embed] };
-                }
-              } else {
-                embed.setTitle(
-                  "❌ No streams were found for the provided song"
-                );
-                return { embeds: [embed] };
-              }
-            }
-          }
-        } else {
-          const saavnSong = await fetchSong(searchTerm, 1);
-          if (
-            saavnSong?.status == "SUCCESS" &&
-            saavnSong?.data?.results[0] &&
-            saavnSong?.data?.results[0]?.downloadUrl != false
-          ) {
-            await buildSong(saavnSong.data.results[0]);
-          } else {
-            embed.setTitle("❌ No songs were found for the provided query");
-            return { embeds: [embed] };
-          }
-        }
-
-        async function fetchSong(searchTerm: any, limit: Number) {
-          const result: any = await fetch(
-            `${process.env.Song_API_URL}/search/songs?query=${searchTerm}&limit=${limit}`,
-            {
-              method: "GET",
-              headers: {
-                "content-type": "application/json",
-              },
-            }
-          );
-          if (result.status == 200) {
-            const song = await result.json();
-            return song;
-          } else {
-            return null;
-          }
-        }
-
-        async function buildSong(song: any) {
-          const title = decodeHTMLEntities(song.name);
-          const id = song.id;
-          const image = song.image[song.image?.length - 1]?.link;
-          const artists = decodeHTMLEntities(song.primaryArtists);
-          let duration = decodeHTMLEntities(song.duration);
-          duration = await convertTime(duration);
-
-          async function convertTime(d: any) {
-            d = Number(d);
-            var h = Math.floor(d / 3600);
-            var m = Math.floor((d % 3600) / 60);
-            var s = Math.floor((d % 3600) % 60);
-
-            var hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours ") : "";
-            var mDisplay = m > 0 ? m + (m == 1 ? " minute " : " minutes ") : "";
-            var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-            return hDisplay + mDisplay + sDisplay;
-          }
-
-          await playSong(song);
-
-          embed.setTitle(title);
-          embed.setThumbnail(image);
-          embed.addFields({
-            name: "Artists",
-            value: "```\n" + artists + "```",
-            inline: false,
-          });
-          embed.addFields({
-            name: "Album",
-            value: "```\n" + decodeHTMLEntities(song.album?.name) + "```",
-            inline: true,
-          });
-          embed.addFields({
-            name: "Duration",
-            value: "```\n" + duration + "```",
-            inline: true,
-          });
-
-          row.addComponents(
-            new ButtonBuilder()
-              .setLabel("STOP")
-              .setEmoji("⏹️")
-              .setCustomId("stop")
-              .setStyle(ButtonStyle.Danger)
-          );
-        }
-
-        if (row?.components[0]) {
-          return { embeds: [embed], components: [row] };
-        } else {
-          return { embeds: [embed] };
-        }
+      song = await int.client.getSong(int.options?.get("query")?.value as string);
+      if (!song || !song?.downloadUrl) {
+        return await m.edit({
+          embeds: [
+            new EmbedBuilder()
+              .setDescription(`**❌ No songs were found for the provided query**`)
+              .setColor(11553764)
+          ],
+        }).catch(() => null);
       }
 
-      async function playSong(song: any) {
-        const player = createAudioPlayer({
-          behaviors: {
-            noSubscriber: NoSubscriberBehavior.Stop,
-          },
-        });
-        const connection = joinVoiceChannel({
-          channelId: int.member?.voice?.channelId,
-          guildId: int.guildId,
-          adapterCreator: int.guild.voiceAdapterCreator,
-        });
-
-        connection.subscribe(player);
-
-        let resource = createAudioResource(
-          song.downloadUrl[song.downloadUrl?.length - 1]?.link,
-          {
-            metadata: {
-              title: song.name,
-            },
-          }
-        );
-        player.play(resource);
+      if (!queue || queue.tracks.length == 0) {
+        const newQueue = int.client.createQueue(song, int.member.user, int.channelId)
+        int.client.queues?.set(int.guild?.id, newQueue)
+        int.client.int.push(int);
+        await int.client.playSong(int.member.voice?.channel, song);
+        return;
       }
-    } else {
-      embed.setColor(11553764);
-      embed.setTitle("⚠️ You must be in a Voice/Stage Channel to use this command");
-      int.reply({ embeds: [embed] });
+
+      queue.tracks.push(int.client.createSong(song, int.member.user));
+      int.client.int.push(int);
+      return await m.edit({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**✅ Successfully queued at Position - \`#${queue.tracks.length - 1}\`**`)
+            .setColor(11553764)
+            .addFields({
+              name: "📀 Song",
+              value: "```\n" + int.client.decodeHTMLEntities(song.name) + "```",
+              inline: true,
+            })
+            .addFields({
+              name: "👤 Requester",
+              value: `<@${int.member.user?.id}>`,
+              inline: true,
+            })
+            .setThumbnail(`${song.image[song.image?.length - 1]?.link}`)
+        ],
+      }).catch(() => null);
+    } catch (e) {
+      console.error(e);
+      return await int.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(`**❌ Something went wrong while executing that command**`)
+            .setColor(11553764)
+        ],
+        ephemeral: true
+      }).catch(() => null);
     }
   },
 } as CommandObject;

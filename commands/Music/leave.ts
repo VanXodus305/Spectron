@@ -27,7 +27,7 @@ export default {
       await int.reply({
         embeds: [
           new EmbedBuilder()
-            .setDescription(`**✅ Successfully left <#${oldConnection.joinConfig.channelId}>**`)
+            .setDescription(`**👋 Successfully left <#${oldConnection.joinConfig.channelId}>**`)
             .setColor(11553764)
         ],
       }).catch(() => null);

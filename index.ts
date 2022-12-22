@@ -12,6 +12,7 @@ const client: any = new Client({
 // require ("./util/music.ts")(client);
 
 client.queues = new Collection();
+client.int = [];
 
 client.on("ready", () => {
   new WOK({

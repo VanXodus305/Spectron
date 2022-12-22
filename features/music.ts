@@ -1,42 +1,48 @@
-import { Client, EmbedBuilder, VoiceBasedChannel } from 'discord.js';
-import { joinVoiceChannel, getVoiceConnection, VoiceConnectionStatus, entersState } from "@discordjs/voice";
+import { EmbedBuilder, Snowflake, User, VoiceBasedChannel } from 'discord.js';
+import { joinVoiceChannel, getVoiceConnection, VoiceConnectionStatus, entersState, createAudioResource, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus } from "@discordjs/voice";
+import fetch from "cross-fetch";
 import WOK from 'wokcommands';
 
 export default async (instance: WOK, client: any) => {
-  client.formatDuration = (d: number) => {
-    d = Number(d);
-    var h = Math.floor(d / 3600);
-    var m = Math.floor((d % 3600) / 60);
-    var s = Math.floor((d % 3600) % 60);
-
-    var hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours ") : "";
-    var mDisplay = m > 0 ? m + (m == 1 ? " minute " : " minutes ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-    return hDisplay + mDisplay + sDisplay;
+  const m2 = (t: any) => {
+    return parseInt(t) < 10 ? `0${t}` : `${t}`
+  }
+  const m3 = (t: any) => {
+    return parseInt(t) < 100 ? `0${m2(t)}` : `${t}`
   }
 
-  client.createBar = (duration: number, position: number) => {
+
+  client.getTime = () => {
+    const d = new Date;
+    return `${m2(d.getHours())}:${m2(d.getMinutes())}:${m2(d.getSeconds())}.${m3(d.getMilliseconds())}`
+  }
+
+  client.getSong = async (query: string) => {
     try {
-      const full = "▰";
-      const empty = "▱"
-      const size = "▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱".length;
-      const percent: any = duration == 0 ? null : Math.floor(position / duration * 100)
-      const fullBars = Math.round(size * (percent / 100));
-      const emptyBars = size - fullBars;
-      return `**${full.repeat(fullBars)}${empty.repeat(emptyBars)}**`;
-    } catch (e) {
-      console.error(e);
+      const result: any = await fetch(`${process.env.Song_API_URL}/search/songs?query=${query}&limit=1`,
+        {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      ).catch(() => null);
+      if (result.status == 200) {
+        const song = await result.json().catch(() => null);
+        if (song.data?.results[0]) {
+          return song.data?.results[0];
+        }
+        else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   }
-
-  // client.getTime = () => {
-  //   const d = new Date;
-  //   return `${m2(d.getHours())}:${m2(d.getMinutes())}:${m2(d.getSeconds())}.${m3(d.getMilliseconds())}`
-  // }
-
-  // client.getYTLink = (ID) => {
-  //   return `https://www.youtube.com/watch?v=${ID}`;
-  // }
 
   client.joinVoiceChannel = async (channel: VoiceBasedChannel) => {
     return new Promise(async (res, rej) => {
@@ -103,7 +109,7 @@ export default async (instance: WOK, client: any) => {
         return rej({
           embeds: [
             new EmbedBuilder()
-              .setDescription(`**⚠️ I'm not connected to any Voice/Stage Channel**`)
+              .setDescription(`**⚠️ I'm not connected in any Voice/Stage Channel**`)
               .setColor(11553764)
           ],
         });
@@ -111,218 +117,238 @@ export default async (instance: WOK, client: any) => {
     });
   }
 
-  // client.getResource = (queue, songInfoId, seekTime = 0) => {
-  //   let Qargs = "";
-  //   let effects = queue?.effects || {
-  //     bassboost: 4,
-  //     speed: 1,
-  //   }
-  //   if (effects.normalizer) Qargs += `,dynaudnorm=f=200`;
-  //   if (effects.bassboost) Qargs += `,bass=g=${effects.bassboost}`
-  //   if (effects.speed) Qargs += `,atempo=${effects.speed}`
-  //   if (effects["3d"]) Qargs += `,apulsator=hz=0.03`
-  //   if (effects.subboost) Qargs += `,asubboost`
-  //   if (effects.mcompand) Qargs += `,mcompand`
-  //   if (effects.haas) Qargs += `,haas`
-  //   if (effects.gate) Qargs += `,agate`
-  //   if (effects.karaoke) Qargs += `,stereotools=mlev=0.03`
-  //   if (effects.flanger) Qargs += `,flanger`
-  //   if (effects.pulsator) Qargs += `,apulsator=hz=1`
-  //   if (effects.surrounding) Qargs += `,surround`
-  //   if (effects.vaporwave) Qargs += `,aresample=48000,asetrate=48000*0.8`
-  //   if (effects.nightcore) Qargs += `,aresample=48000,asetrate=48000*1.5`
-  //   if (effects.phaser) Qargs += `,aphaser=in_gain=0.4`
-  //   if (effects.tremolo) Qargs += `,tremolo`
-  //   if (effects.vibrato) Qargs += `,vibrato=f=6.5`
-  //   if (effects.reverse) Qargs += `,areverse`
-  //   if (effects.treble) Qargs += `,treble=g=5`
-  //   if (Qargs.startsWith(",")) Qargs = Qargs.substring(1)
-  //   const requestOpts = {
-  //     filter: "audioonly",
-  //     fmt: "mp3",
-  //     highWaterMark: 1 << 62,
-  //     liveBuffer: 1 << 62,
-  //     dlChunkSize: 0,
-  //     seek: Math.floor(seekTime / 1000),
-  //     bitrate: queue?.bitrate || 128,
-  //     quality: "lowestaudio",
-  //     encoderArgs: Qargs ? ["-af", Qargs] : ['-af', 'bass=g=6,dynaudnorm=f=200'] // queue.filters
-  //   };
-  //   if (client.config.YOUTUBE_LOGIN_COOKIE && client.config.YOUTUBE_LOGIN_COOKIE.length > 10) {
-  //     requestOpts.requestOptions = {
-  //       headers: {
-  //         cookie: client.config.YOUTUBE_LOGIN_COOKIE,
-  //       }
-  //     }
-  //   }
-  //   const resource = createAudioResource(dcYtdl(client.getYTLink(songInfoId), requestOpts), {
-  //     inlineVolume: true
-  //   });
-  //   const volume = queue && queue.volume && queue.volume <= 150 && queue.volume >= 1 ? (queue.volume / 100) : 0.15;  // queue.volume / 100;
-  //   resource.volume.setVolume(volume);
-  //   resource.playbackDuration = seekTime;
-  //   return resource;
-  // }
+  client.getResource = (queue: any, songInfo: any) => {
+    const url = songInfo.downloadUrl
+    if (!url) return null;
+    const resource = createAudioResource(url[url?.length - 1]?.link, {
+      inlineVolume: false,
+      metadata: {
+        id: songInfo.id,
+      }
+    });
+    return resource;
+  }
 
-  // client.playSong = async (channel, songInfo) => {
-  //   return new Promise(async (res, rej) => {
-  //     const oldConnection = getVoiceConnection(channel.guild.id);
-  //     if (oldConnection) {
-  //       if (oldConnection.joinConfig.channelId != channel.id) return rej("We aren't in the same channel!")
-  //       try {
-  //         const curQueue = client.queues.get(channel.guild.id);
+  client.playSong = async (channel: VoiceBasedChannel, songInfo: any) => {
+    return new Promise(async (res, rej) => {
+      const oldConnection = getVoiceConnection(channel.guild.id);
+      if (oldConnection) {
+        if (oldConnection.joinConfig.channelId != channel.id) {
+          return rej(
+            {
+              embeds: [
+                new EmbedBuilder()
+                  .setDescription(`**⚠️ I'm already connected in <#${oldConnection.joinConfig.channelId}>**`)
+                  .setColor(11553764)
+              ],
+              ephemeral: true
+            }
+          );
+        }
+        try {
+          const curQueue = client.queues.get(channel.guild.id);
 
-  //         const player = createAudioPlayer({
-  //           behaviors: {
-  //             noSubscriber: NoSubscriberBehavior.Stop,
-  //           },
-  //         });
-  //         oldConnection.subscribe(player);
+          const player = createAudioPlayer({
+            behaviors: {
+              noSubscriber: NoSubscriberBehavior.Stop,
+            },
+          });
+          oldConnection.subscribe(player);
 
-  //         const resource = client.getResource(curQueue, songInfo.id);
-  //         // play the resource
-  //         player.play(resource);
+          const resource = client.getResource(curQueue, songInfo);
+          player.play(resource);
 
-  //         // When the player plays a new song
-  //         player.on("playing", (player) => {
-  //           const queue = client.queues.get(channel.guild.id);
-  //           // if filters changed, don't send something
-  //           if (queue && queue.filtersChanged) {
-  //             queue.filtersChanged = false;
-  //           } else {
-  //             client.sendQueueUpdate(channel.guild.id);
-  //           }
+          player.on(AudioPlayerStatus.Playing, async () => {
+            const queue = client.queues.get(channel.guild.id);
+            client.sendQueueUpdate();
+          });
 
-  //         });
-  //         // When the player goes on idle
-  //         player.on("idle", () => {
-  //           const queue = client.queues.get(channel.guild.id);
-  //           console.log(`${client.getTime()} :: QueueShift - Idle/Skip`)
-  //           handleQueue(queue)
-  //         })
-  //         // when an error happens
-  //         player.on('error', error => {
-  //           console.error(error);
-  //           const queue = client.queues.get(channel.guild.id);
-  //           console.log(`${client.getTime()} :: QueueShift - Error`)
-  //           handleQueue(queue)
-  //         });
+          player.on(AudioPlayerStatus.Idle, () => {
+            const queue = client.queues.get(channel.guild.id);
+            handleQueue(queue);
+          });
 
-  //         async function handleQueue(queue) {
-  //           if (queue && !queue.filtersChanged) {
-  //             try {
-  //               player.stop()
-  //               if (queue && queue.tracks && queue.tracks.length > 1) {
-  //                 queue.previous = queue.tracks[0];
-  //                 if (queue.trackloop && !queue.skipped) {
-  //                   if (queue.paused) queue.paused = false;
-  //                   player.play(client.getResource(queue, queue.tracks[0].id))
-  //                 } else if (queue.queueloop && !queue.skipped) {
-  //                   const skipped = queue.tracks.shift();
-  //                   queue.tracks.push(skipped);
-  //                   if (queue.paused) queue.paused = false;
-  //                   player.play(client.getResource(queue, queue.tracks[0].id));
-  //                 } else {
-  //                   if (queue.skipped) queue.skipped = false;
-  //                   if (queue.paused) queue.paused = false;
-  //                   queue.tracks.shift();
-  //                   player.play(client.getResource(queue, queue.tracks[0].id));
-  //                 }
-  //               } else if (queue && queue.tracks && queue.tracks.length <= 1) { // removes the nowplaying, if no upcoming and ends it
-  //                 queue.previous = queue.tracks[0];
-  //                 if (queue.trackloop || queue.queueloop && !queue.skipped) {
-  //                   player.play(client.getResource(queue, queue.tracks[0].id));
-  //                 } else {
-  //                   if (queue.skipped) queue.skipped = false;
-  //                   queue.tracks = [];
-  //                 }
-  //               }
-  //             } catch (e) { console.error(e) }
-  //           }
-  //         }
-  //         return res(songInfo);
-  //       } catch (e) {
-  //         return rej(e)
-  //       }
-  //     } else {
-  //       return rej("I'm not connected somwhere.")
-  //     }
-  //   })
+          player.on('error', error => {
+            console.error(error);
+            const queue = client.queues.get(channel.guild.id);
+            handleQueue(queue);
+          });
 
-  // }
+          async function handleQueue(queue: any) {
+            if (queue) {
+              try {
+                player.stop();
+                if (queue && queue.tracks && queue.tracks.length > 1) {
+                  queue.previous = queue.tracks[0];
+                  if (queue.trackloop && !queue.skipped) {
+                    if (queue.paused) queue.paused = false;
+                    player.play(client.getResource(queue, queue.tracks[0]))
+                  } else if (queue.queueloop && !queue.skipped) {
+                    const skipped = queue.tracks.shift();
+                    queue.tracks.push(skipped);
+                    if (queue.paused) queue.paused = false;
+                    player.play(client.getResource(queue, queue.tracks[0]));
+                  } else {
+                    if (queue.skipped) queue.skipped = false;
+                    if (queue.paused) queue.paused = false;
+                    queue.tracks.shift();
+                    player.play(client.getResource(queue, queue.tracks[0]));
+                  }
+                }
+                else if (queue && queue.tracks && queue.tracks.length <= 1) {
+                  queue.previous = queue.tracks[0];
+                  if (queue.trackloop || queue.queueloop && !queue.skipped) {
+                    player.play(client.getResource(queue, queue.tracks[0]));
+                  }
+                  else {
+                    if (queue.skipped) {
+                      queue.skipped = false;
+                    }
+                    queue.tracks = [];
+                  }
+                }
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }
+          return res(songInfo);
+        } catch (e) {
+          console.error(e);
+          return rej(e);
+        }
+      }
+      else {
+        return rej(
+          {
+            embeds: [
+              new EmbedBuilder()
+                .setDescription(`**⚠️ I'm not connected in any Voice/Stage Channel**`)
+                .setColor(11553764)
+            ],
+            ephemeral: true
+          }
+        );
+      }
+    })
+  }
 
-  // client.sendQueueUpdate = async (guildId) => {
-  //   const queue = client.queues.get(guildId);
-  //   if (!queue || !queue.tracks || queue.tracks.length == 0 || !queue.textChannel) return
-  //   const textChannel = client.channels.cache.get(queue.textChannel) || await client.channels.fetch(queue.textChannel).catch(() => null);
-  //   if (!textChannel) return
-  //   const song = queue.tracks[0];
+  client.sendQueueUpdate = async () => {
+    const queue = client.queues.get(client.int[0]?.guildId);
+    if (!queue || !queue.tracks || queue.tracks.length == 0 || !queue.textChannel) return;
+    const textChannel = client.channels.cache.get(queue.textChannel) || await client.channels.fetch(queue.textChannel).catch(() => null);
+    if (!textChannel) return;
 
-  //   const songEmbed = new Discord.MessageEmbed().setColor("FUCHSIA")
-  //     .setTitle(`${song.title}`)
-  //     .setURL(client.getYTLink(song.id))
-  //     .addField(`**Duration:**`, `> \`${song.durationFormatted}\``, true)
-  //     .addField(`**Requester:**`, `> ${song.requester} \`${song.requester.tag}\``, true)
-  //   if (song?.thumbnail?.url) songEmbed.setImage(`${song?.thumbnail?.url}`);
+    const song = queue.tracks[0];
+    const songEmbed = new EmbedBuilder()
+      .setColor(11553764)
+      .setTitle(`${client.decodeHTMLEntities(song.name)}`)
+      .addFields({
+        name: "👥 Artists",
+        value: "```\n" + client.decodeHTMLEntities(song.primaryArtists) + "```",
+        inline: false,
+      })
+      .addFields({
+        name: "📀 Album",
+        value: "```\n" + client.decodeHTMLEntities(song.album?.name) + "```",
+        inline: true,
+      })
+      .addFields({
+        name: "🕒 Duration",
+        value: "```\n" + client.formatDuration(client.decodeHTMLEntities(song.duration)) + "```",
+        inline: true,
+      })
+      .addFields({
+        name: "👤 Requester",
+        value: `<@${client.int[0].user.id}>`,
+        inline: true,
+      })
+      .setThumbnail(song.image[song.image?.length - 1]?.link);
 
-  //   textChannel.send({
-  //     embeds: [
-  //       songEmbed
-  //     ]
-  //   }).catch(console.warn)
-  // }
+    if (queue.previous) {
+      await client.int[0].followUp({
+        embeds: [
+          songEmbed
+        ]
+      }).catch(() => null);
+      client.int.shift();
+    }
+    else {
+      const msg = await client.int[0].fetchReply().catch(() => null); 
+      msg?.edit({
+        embeds: [
+          songEmbed
+        ]
+      }).catch(() => null);
+      client.int.shift();
+    }
+  }
 
-  // client.createSong = (song, requester) => {
-  //   return { ...song, requester }
-  // }
+  client.createSong = (song: any, requester: User) => {
+    return { ...song, requester }
+  }
 
-  // client.queuePos = (length) => {
-  //   const str = {
-  //     1: "st",
-  //     2: "nd",
-  //     3: "rd",
-  //   }
-  //   return `${length}${str[length % 10] ? str[length % 10] : "th"}`
-  // }
+  client.createQueue = (song: any, user: User, channelId: Snowflake) => {
+    return {
+      textChannel: channelId,
+      paused: false,
+      skipped: false,      
+      trackloop: false,
+      queueloop: false,     
+      tracks: [client.createSong(song, user)],
+      previous: undefined,
+      creator: user,
+    }
+  }
 
-  // client.createQueue = (song, user, channelId, bitrate = 128) => {
-  //   return {
-  //     textChannel: channelId,
-  //     paused: false,
-  //     skipped: false,
-  //     effects: {
-  //       bassboost: 6,
-  //       subboost: false,
-  //       mcompand: false,
-  //       haas: false,
-  //       gate: false,
-  //       karaoke: false,
-  //       flanger: false,
-  //       pulsator: false,
-  //       surrounding: false,
-  //       "3d": false,
-  //       vaporwave: false,
-  //       nightcore: false,
-  //       phaser: false,
-  //       normalizer: false,
-  //       speed: 1,
-  //       tremolo: false,
-  //       vibrato: false,
-  //       reverse: false,
-  //       treble: false,
-  //     },
-  //     trackloop: false,
-  //     queueloop: false,
-  //     filtersChanged: false,
-  //     volume: 15, // queue volume, between 1 and 100
-  //     tracks: [client.createSong(song, user)],
-  //     previous: undefined,
-  //     creator: user,
-  //     bitrate: bitrate
-  //   }
-  // }
-}
+  client.formatDuration = (d: number) => {
+    d = Number(d);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor((d % 3600) / 60);
+    var s = Math.floor((d % 3600) % 60);
 
-function delay(ms: number) {
-  return new Promise(r => setTimeout(() => r(2), ms));
+    var hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours ") : "";
+    var mDisplay = m > 0 ? m + (m == 1 ? " minute " : " minutes ") : "";
+    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    return hDisplay + mDisplay + sDisplay;
+  }
+
+  client.createBar = (duration: number, position: number) => {
+    try {
+      const full = "▰";
+      const empty = "▱"
+      const size = "▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱".length;
+      const percent: any = duration == 0 ? null : Math.floor(position / duration * 100)
+      const fullBars = Math.round(size * (percent / 100));
+      const emptyBars = size - fullBars;
+      return `**${full.repeat(fullBars)}${empty.repeat(emptyBars)}**`;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  client.decodeHTMLEntities = (text: string) => {
+    var entities = [
+      ["amp", "&"],
+      ["apos", "'"],
+      ["#x27", "'"],
+      ["#x2F", "/"],
+      ["#39", "'"],
+      ["#47", "/"],
+      ["lt", "<"],
+      ["gt", ">"],
+      ["nbsp", " "],
+      ["quot", '"'],
+    ];
+    for (var i = 0, max = entities.length; i < max; ++i)
+      text = text.replace(
+        new RegExp("&" + entities[i][0] + ";", "g"),
+        entities[i][1]
+      );
+    return text;
+  }
+
+  function delay(ms: number) {
+    return new Promise(r => setTimeout(() => r(2), ms));
+  }
 }
