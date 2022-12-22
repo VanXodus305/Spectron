@@ -1,10 +1,6 @@
 .env
 node_modules
 .vscode
-sample.ts
-sample.js
 Testing
-logs
 test.ts
-.gitconfig
 package-lock.json
