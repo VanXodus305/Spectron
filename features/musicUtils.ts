@@ -126,6 +126,7 @@ export default async (instance: WOK, client: any) => {
         id: songInfo.id,
       }
     });
+    // resource.playbackDuration = 0;
     return resource;
   }
 
@@ -260,16 +261,14 @@ export default async (instance: WOK, client: any) => {
       })
       .addFields({
         name: "👤 Requester",
-        value: `<@${client.int[0].user.id}>`,
+        value: `<@${song.requester.id}>`,
         inline: true,
       })
       .setThumbnail(song.image[song.image?.length - 1]?.link);
 
     if (queue.previous) {
       await client.int[0].followUp({
-        embeds: [
-          songEmbed
-        ]
+        embeds: [songEmbed]
       }).catch(() => null);
       client.int.shift();
     }
@@ -304,12 +303,12 @@ export default async (instance: WOK, client: any) => {
   client.createBar = (duration: number, position: number) => {
     try {
       const full = "▰";
-      const empty = "▱"
-      const size = "▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱".length;
+      const empty = "▱";
+      const size = 15;
       const percent: any = duration == 0 ? null : Math.floor(position / duration * 100)
       const fullBars = Math.round(size * (percent / 100));
       const emptyBars = size - fullBars;
-      return `**${full.repeat(fullBars)}${empty.repeat(emptyBars)}**`;
+      return `${full.repeat(fullBars)}${empty.repeat(emptyBars)}`;
     } catch (e) {
       console.error(e);
     }

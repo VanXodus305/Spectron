@@ -132,6 +132,7 @@ export default {
       }
 
       song = await int.client.getSong(int.options?.get("query")?.value as string);
+      song.requester = int.user;
       if (!song || !song?.downloadUrl) {
         return await m.edit({
           embeds: [
@@ -181,5 +182,5 @@ export default {
         ephemeral: true
       }).catch(() => null);
     }
-  },
+  }
 } as CommandObject;

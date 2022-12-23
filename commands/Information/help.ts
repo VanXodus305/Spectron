@@ -24,7 +24,7 @@ export default {
     }
     catch (error) {
       console.error(error);
-      await int.editReply({
+      await int.reply({
         embeds: [
           new EmbedBuilder()
             .setColor(11553764)

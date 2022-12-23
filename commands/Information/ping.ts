@@ -5,7 +5,7 @@ export default {
   description: "Provides the Bot's Latency and Uptime",
   testOnly: false,
   type: CommandType.SLASH,
-  callback: async ({ client, interaction }: { client: Client, interaction: Interaction }) => {
+  callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
 
     try {
@@ -32,12 +32,13 @@ export default {
     }
     catch (error) {
       console.error(error);
-      await int.editReply({
+      await int.reply({
         embeds: [
           new EmbedBuilder()
             .setColor(11553764)
             .setDescription("**❌ Something went wrong while executing that command**")
         ],
+        ephemeral: true
       }).catch(() => null);
     }
   }
