@@ -15,7 +15,7 @@ export default {
       embed.setFields([
         { name: "🤖 Bot Latency", value: "```Calculating...```", inline: true },
         { name: "💓 API Latency", value: "```Calculating...```", inline: true },
-        { name: "⏳ Uptime", value: "```Calculating...```" }
+        { name: "⌛ Uptime", value: "```Calculating...```" }
       ]);
       await int
         .reply({ embeds: [embed], ephemeral: true, fetchReply: true })
