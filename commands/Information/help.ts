@@ -15,7 +15,7 @@ export default {
       await int.reply({
         embeds: [
           new EmbedBuilder()
-            .setTitle(`ℹ️ List of Commands`)
+            .setTitle(`List of Commands`)
             .setDescription(description)
             .setColor(11553764)
         ],

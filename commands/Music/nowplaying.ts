@@ -9,7 +9,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Shows the Song that is Currently Playing on this Server",
+  description: "Showes the Currently Playing Song on this Server",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
@@ -29,7 +29,7 @@ export default {
       }
 
       const oldConnection: any = getVoiceConnection(int.guild.id);
-      const curPos = Math.floor(oldConnection.state.subscription.player.state.resource.playbackDuration / 1000);
+      const curPos = Math.floor(oldConnection?.state.subscription.player.state.resource.playbackDuration / 1000);
       const song = queue.tracks[0];
       const songEmbed = new EmbedBuilder()
         .setColor(11553764)
