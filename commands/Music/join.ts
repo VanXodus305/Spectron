@@ -10,7 +10,7 @@ export default {
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
     int.client.lastInt = int;
-     
+
     try {
       if (!int.member?.voice?.channel) {
         return await int.reply({
@@ -81,7 +81,7 @@ export default {
       }
 
       await int.client.joinVoiceChannel(int.member?.voice?.channel);
-      
+
       await int.reply({
         embeds: [
           new EmbedBuilder()

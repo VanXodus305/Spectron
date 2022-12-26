@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, Snowflake, User, VoiceBasedChannel } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, Message, Snowflake, User, VoiceBasedChannel } from 'discord.js';
 import { joinVoiceChannel, getVoiceConnection, VoiceConnectionStatus, entersState, createAudioResource, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus } from "@discordjs/voice";
 import fetch from "cross-fetch";
 import WOK from 'wokcommands';
@@ -39,8 +39,7 @@ export default async (instance: WOK, client: any) => {
 
   client.getRecommendedSong = async (reference: any) => {
     try {
-      const artists = reference.primaryArtistsId?.split(',\\s*');
-      const result: any = await fetch(`${process.env.Song_API_URL}/artists/${artists[Math.floor(Math.random() * artists.length)]}/recommendations/${reference.id}`,
+      const result: any = await fetch(`${process.env.Song_API_URL}/artists/${reference.primaryArtistsId?.split(',\\s*')[0]}/recommendations/${reference.id}`,
         {
           method: "GET",
           headers: {
@@ -277,7 +276,7 @@ export default async (instance: WOK, client: any) => {
           }
         );
       }
-    })
+    });
   }
 
   client.sendQueueUpdate = async (channel: VoiceBasedChannel) => {
@@ -312,14 +311,15 @@ export default async (instance: WOK, client: any) => {
       })
       .setThumbnail(song.image[song.image?.length - 1]?.link);
 
-    if (!queue.resumed)  {
+    if (!queue.resumed) {
+      const msg: Message = await song.interaction.fetchReply().catch(() => null);
       if (queue.previous) {
-        await song.interaction.followUp({
-          embeds: [songEmbed]
+        await msg.reply({
+          embeds: [songEmbed],
+          failIfNotExists: false
         }).catch(() => null);
       }
       else {
-        const msg = await song.interaction.fetchReply().catch(() => null);
         msg?.edit({
           embeds: [
             songEmbed
@@ -328,7 +328,7 @@ export default async (instance: WOK, client: any) => {
       }
     } else {
       queue.resumed = false;
-    }  
+    }
   }
 
   client.createSong = (song: any, requester: User) => {
