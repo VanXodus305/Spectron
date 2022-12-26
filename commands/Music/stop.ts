@@ -9,7 +9,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Resumes the Currently Playing Song on this Server",
+  description: "Stops Playing Music and Clears the Queue",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
@@ -62,25 +62,13 @@ export default {
         }).catch(() => null);
       }
 
-      if (!queue.paused) {
-        return await int.reply({
-          embeds: [
-            new EmbedBuilder()
-              .setDescription(`**⚠️ \`${int.client.decodeHTMLEntities(oldConnection?.state.subscription.player.state.resource.metadata.details?.name)}\` is already playing**`)
-              .setColor(11553764)
-          ],
-          ephemeral: true
-        }).catch(() => null);
-      }
-
-      queue.paused = false;
-      queue.resumed = true;
-      oldConnection.state.subscription.player.unpause();
+      queue.tracks = [];
+      oldConnection.state.subscription.player.stop();
 
       return await int.reply({
         embeds: [
           new EmbedBuilder()
-            .setDescription(`**✅ Successfully resumed \`${int.client.decodeHTMLEntities(oldConnection?.state.subscription.player.state.resource.metadata.details?.name)}\`**`)
+            .setDescription(`**✅ Successfully stopped playing and cleared the queue**`)
             .setColor(11553764)
         ],
       }).catch(() => null);

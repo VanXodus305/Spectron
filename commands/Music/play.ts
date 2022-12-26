@@ -28,7 +28,8 @@ export default {
   ],
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
-    int.client.lastInt = int;
+    int.client.lastInt?.set(int.guild?.id, int);
+
 
     if (!int.member?.voice?.channel) {
       return await int.reply({
@@ -145,8 +146,8 @@ export default {
       }
 
       if (!queue || queue.tracks.length == 0) {
-        const newQueue = int.client.createQueue(song, int.member.user, int.channelId)
-        int.client.queues?.set(int.guild?.id, newQueue)
+        const newQueue = int.client.createQueue(song, int.member.user, int.channelId);
+        int.client.queues?.set(int.guild?.id, newQueue);
         await int.client.playSong(int.member.voice?.channel, song);
         return;
       }

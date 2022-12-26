@@ -66,7 +66,7 @@ export default {
         return await int.reply({
           embeds: [
             new EmbedBuilder()
-              .setDescription(`**⚠️ \`${oldConnection?.state.subscription.player.state.resource.metadata.details?.name}\` is already paused**`)
+              .setDescription(`**⚠️ \`${int.client.decodeHTMLEntities(oldConnection?.state.subscription.player.state.resource.metadata.details?.name)}\` is already paused**`)
               .setColor(11553764)
           ],
           ephemeral: true
@@ -80,7 +80,7 @@ export default {
       return await int.reply({
         embeds: [
           new EmbedBuilder()
-            .setDescription(`**✅ Successfully paused \`${oldConnection?.state.subscription.player.state.resource.metadata.details?.name}\`**`)
+            .setDescription(`**✅ Successfully paused \`${int.client.decodeHTMLEntities(oldConnection?.state.subscription.player.state.resource.metadata.details?.name)}\`**`)
             .setColor(11553764)
         ],
       }).catch(() => null);

@@ -1,4 +1,4 @@
-import { EmbedBuilder, GuildMember, VoiceState } from "discord.js";
+import { EmbedBuilder, GuildMember, Message, VoiceState } from "discord.js";
 import WOK from "wokcommands";
 import { getVoiceConnection } from "@discordjs/voice";
 
@@ -29,7 +29,9 @@ export default async (oldState: VoiceState, newState: VoiceState, instance: WOK)
         if (o.channel?.members.filter((m: GuildMember) => !m.user.bot).size as any >= 1) return;
         if (connection && connection.joinConfig.channelId == o.channelId) {
           connection.destroy();
-          await o.client.lastInt?.followUp({
+          const lastInt = o.client.lastInt.get(o.guild.id);
+          const msg: Message = await lastInt?.fetchReply().catch(() => null);
+          await msg.reply({
             embeds: [
               new EmbedBuilder()
                 .setColor(11553764)

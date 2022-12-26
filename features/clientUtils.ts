@@ -4,7 +4,7 @@ import WOK from 'wokcommands';
 export default async (instance: WOK, client: any) => {
   client.queues = new Collection();
   client.commands = new Collection();
-  client.lastInt as CommandInteraction;
+  client.lastInt = new Collection();
 
   client.formatDuration = (t: number, sf: boolean = false) => {
     var d = Math.floor(t / 86400);

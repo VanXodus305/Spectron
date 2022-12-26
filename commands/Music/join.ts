@@ -9,7 +9,7 @@ export default {
   guildOnly: true,
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
-    int.client.lastInt = int;
+    int.client.lastInt?.set(int.guild?.id, int);
 
     try {
       if (!int.member?.voice?.channel) {
