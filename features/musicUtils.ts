@@ -1,4 +1,4 @@
-import { EmbedBuilder, Snowflake, User, VoiceBasedChannel } from 'discord.js';
+import { CommandInteraction, EmbedBuilder, Snowflake, User, VoiceBasedChannel } from 'discord.js';
 import { joinVoiceChannel, getVoiceConnection, VoiceConnectionStatus, entersState, createAudioResource, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus } from "@discordjs/voice";
 import fetch from "cross-fetch";
 import WOK from 'wokcommands';
@@ -15,9 +15,49 @@ export default async (instance: WOK, client: any) => {
         }
       ).catch(() => null);
       if (result.status == 200) {
-        const song = await result.json().catch(() => null);
-        if (song.data?.results[0]) {
-          return song.data?.results[0];
+        const songs = await result.json().catch(() => null);
+        if (songs.data?.results[0]) {
+          const song = songs.data.results.find((song: any) => song.downloadUrl != false);
+          if (song != undefined) {
+            return song;
+          }
+          else {
+            return null;
+          }
+        }
+        else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  client.getRecommendedSong = async (reference: any) => {
+    try {
+      const artists = reference.primaryArtistsId?.split(',\\s*');
+      const result: any = await fetch(`${process.env.Song_API_URL}/artists/${artists[Math.floor(Math.random() * artists.length)]}/recommendations/${reference.id}`,
+        {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      ).catch(() => null);
+      if (result.status == 200) {
+        const songs = await result.json().catch(() => null);
+        if (songs?.data[0]) {
+          songs.data.sort(() => {
+            return (Math.random() > .5) ? 1 : -1
+          });
+        }
+        const song = songs.data.find((song: any) => song.downloadUrl != false);
+        if (song != undefined) {
+          return song;
         }
         else {
           return null;
@@ -105,7 +145,7 @@ export default async (instance: WOK, client: any) => {
   }
 
   client.getResource = (queue: any, songInfo: any) => {
-    const url = songInfo.downloadUrl
+    const url = songInfo.downloadUrl;
     if (!url) return null;
     const resource = createAudioResource(url[url?.length - 1]?.link, {
       inlineVolume: false,
@@ -146,8 +186,7 @@ export default async (instance: WOK, client: any) => {
           player.play(resource);
 
           player.on(AudioPlayerStatus.Playing, async () => {
-            const queue = client.queues.get(channel.guild.id);
-            client.sendQueueUpdate();
+            client.sendQueueUpdate(channel);
           });
 
           player.on(AudioPlayerStatus.Idle, () => {
@@ -171,8 +210,8 @@ export default async (instance: WOK, client: any) => {
                     if (queue.paused) queue.paused = false;
                     player.play(client.getResource(queue, queue.tracks[0]))
                   } else if (queue.queueloop && !queue.skipped) {
-                    const skipped = queue.tracks.shift();
-                    queue.tracks.push(skipped);
+                    const firstSong = queue.tracks.shift();
+                    queue.tracks.push(firstSong);
                     if (queue.paused) queue.paused = false;
                     player.play(client.getResource(queue, queue.tracks[0]));
                   } else {
@@ -182,16 +221,37 @@ export default async (instance: WOK, client: any) => {
                     player.play(client.getResource(queue, queue.tracks[0]));
                   }
                 }
+
                 else if (queue && queue.tracks && queue.tracks.length <= 1) {
                   queue.previous = queue.tracks[0];
                   if (queue.trackloop || queue.queueloop && !queue.skipped) {
                     player.play(client.getResource(queue, queue.tracks[0]));
                   }
                   else {
-                    if (queue.skipped) {
-                      queue.skipped = false;
+                    if (queue.autoplay.state == true) {
+                      const song = await client.getRecommendedSong(queue.previous);
+                      if (song != null) {
+                        song.requester = queue.autoplay.requester;
+                        song.interaction = queue.autoplay.interaction;
+                        if (queue.skipped) queue.skipped = false;
+                        if (queue.paused) queue.paused = false;
+                        queue.tracks.shift();
+                        queue.tracks.push(client.createSong(song, songInfo.requester));
+                        player.play(client.getResource(queue, queue.tracks[0]));
+                      }
+                      else {
+                        if (queue.skipped) {
+                          queue.skipped = false;
+                        }
+                        queue.tracks = [];
+                      }
                     }
-                    queue.tracks = [];
+                    else {
+                      if (queue.skipped) {
+                        queue.skipped = false;
+                      }
+                      queue.tracks = [];
+                    }
                   }
                 }
               } catch (e) {
@@ -220,8 +280,8 @@ export default async (instance: WOK, client: any) => {
     })
   }
 
-  client.sendQueueUpdate = async () => {
-    const queue = client.queues.get(client.int[0]?.guildId);
+  client.sendQueueUpdate = async (channel: VoiceBasedChannel) => {
+    const queue = client.queues.get(channel.guildId);
     if (!queue || !queue.tracks || queue.tracks.length == 0 || !queue.textChannel) return;
     const textChannel = client.channels.cache.get(queue.textChannel) || await client.channels.fetch(queue.textChannel).catch(() => null);
     if (!textChannel) return;
@@ -252,21 +312,23 @@ export default async (instance: WOK, client: any) => {
       })
       .setThumbnail(song.image[song.image?.length - 1]?.link);
 
-    if (queue.previous) {
-      await client.int[0].followUp({
-        embeds: [songEmbed]
-      }).catch(() => null);
-      client.int.shift();
-    }
-    else {
-      const msg = await client.int[0].fetchReply().catch(() => null);
-      msg?.edit({
-        embeds: [
-          songEmbed
-        ]
-      }).catch(() => null);
-      client.int.shift();
-    }
+    if (!queue.resumed)  {
+      if (queue.previous) {
+        await song.interaction.followUp({
+          embeds: [songEmbed]
+        }).catch(() => null);
+      }
+      else {
+        const msg = await song.interaction.fetchReply().catch(() => null);
+        msg?.edit({
+          embeds: [
+            songEmbed
+          ]
+        }).catch(() => null);
+      }
+    } else {
+      queue.resumed = false;
+    }  
   }
 
   client.createSong = (song: any, requester: User) => {
@@ -277,9 +339,15 @@ export default async (instance: WOK, client: any) => {
     return {
       textChannel: channelId,
       paused: false,
+      resumed: false,
       skipped: false,
       trackloop: false,
       queueloop: false,
+      autoplay: {
+        state: false,
+        interaction: CommandInteraction,
+        requester: User
+      },
       tracks: [client.createSong(song, user)],
       previous: undefined,
       creator: user,

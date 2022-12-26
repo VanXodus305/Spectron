@@ -4,7 +4,6 @@ import WOK from 'wokcommands';
 export default async (instance: WOK, client: any) => {
   client.queues = new Collection();
   client.commands = new Collection();
-  client.int = [];
   client.lastInt as CommandInteraction;
 
   client.formatDuration = (t: number, sf: boolean = false) => {
@@ -35,8 +34,8 @@ export default async (instance: WOK, client: any) => {
       ["apos", "'"],
       ["#x27", "'"],
       ["#x2F", "/"],
-      ["#39", "'"],
-      ["#47", "/"],
+      ["#039", "'"],
+      ["#047", "/"],
       ["lt", "<"],
       ["gt", ">"],
       ["nbsp", " "],

@@ -133,6 +133,7 @@ export default {
 
       song = await int.client.getSong(int.options?.get("query")?.value as string);
       song.requester = int.user;
+      song.interaction = int;
       if (!song || !song?.downloadUrl) {
         return await m.edit({
           embeds: [
@@ -146,13 +147,11 @@ export default {
       if (!queue || queue.tracks.length == 0) {
         const newQueue = int.client.createQueue(song, int.member.user, int.channelId)
         int.client.queues?.set(int.guild?.id, newQueue)
-        int.client.int.push(int);
         await int.client.playSong(int.member.voice?.channel, song);
         return;
       }
 
       queue.tracks.push(int.client.createSong(song, int.member.user));
-      int.client.int.push(int);
       return await m.edit({
         embeds: [
           new EmbedBuilder()

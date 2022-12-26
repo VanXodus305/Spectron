@@ -1,4 +1,5 @@
 import {
+  ApplicationCommandOptionType,
   EmbedBuilder,
   Interaction,
 } from "discord.js";
@@ -9,10 +10,18 @@ config();
 
 export default {
   category: "Music",
-  description: "Resumes the Currently Playing Song on this Server",
+  description: "Automatically play Recommended Songs after the Queue ends",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
+  options: [
+    {
+      name: 'choice',
+      type: ApplicationCommandOptionType.Boolean,
+      description: 'Enable/Disable Autoplay for the Currrent Queue',
+      required: true
+    }
+  ],
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
     try {
@@ -62,29 +71,49 @@ export default {
         }).catch(() => null);
       }
 
-      if (!queue.paused) {
+      if (int.options?.get("choice")?.value == true) {
+        if (queue.autoplay.state == true) {
+          return await int.reply({
+            embeds: [
+              new EmbedBuilder()
+                .setColor(11553764)
+                .setDescription("**⚠️ Autoplay is already enabled for the current queue**")
+            ],
+            ephemeral: true
+          }).catch(() => null);
+        }
+        queue.autoplay.state = true;
+        queue.autoplay.interaction = int;
+        queue.autoplay.requester = int.user;
         return await int.reply({
           embeds: [
             new EmbedBuilder()
-              .setDescription(`**⚠️ \`${oldConnection?.state.subscription.player.state.resource.metadata.details?.name}\` is already playing**`)
               .setColor(11553764)
-          ],
-          ephemeral: true
+              .setDescription("**✅ Autoplay has been enabled for the current queue**")
+          ]
         }).catch(() => null);
       }
 
-      queue.paused = false;
-      queue.resumed = true;
-      oldConnection.state.subscription.player.unpause();
-
-      return await int.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setDescription(`**✅ Successfully resumed \`${oldConnection?.state.subscription.player.state.resource.metadata.details?.name}\`**`)
-            .setColor(11553764)
-        ],
-      }).catch(() => null);
-
+      if (int.options?.get("choice")?.value == false) {
+        if (queue.autoplay.state == false) {
+          return await int.reply({
+            embeds: [
+              new EmbedBuilder()
+                .setColor(11553764)
+                .setDescription("**⚠️ Autoplay is already disabled for the current queue**")
+            ],
+            ephemeral: true
+          }).catch(() => null);
+        }
+        queue.autoplay.state = false;
+        return await int.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(11553764)
+              .setDescription("**✅ Autoplay has been disabled for the current queue**")
+          ]
+        }).catch(() => null);
+      }
     }
     catch (error) {
       console.error(error);
