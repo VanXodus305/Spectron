@@ -83,15 +83,18 @@ export default {
           }).catch(() => null);
         }
         queue.autoplay.state = true;
-        queue.autoplay.interaction = int;
-        queue.autoplay.requester = int.user;
-        return await int.reply({
+        
+        await int.reply({
           embeds: [
             new EmbedBuilder()
               .setColor(11553764)
               .setDescription("**✅ Autoplay has been enabled for the current queue**")
           ]
         }).catch(() => null);
+
+        queue.autoplay.message = await int.fetchReply().catch(() => null);
+        queue.autoplay.requester = int.user;
+        return;
       }
 
       if (int.options?.get("choice")?.value == false) {

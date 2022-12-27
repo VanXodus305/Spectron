@@ -134,7 +134,7 @@ export default {
 
       song = await int.client.getSong(int.options?.get("query")?.value as string);
       song.requester = int.user;
-      song.interaction = int;
+      song.message = await int.fetchReply().catch(() => null);
       if (!song || !song?.downloadUrl) {
         return await m.edit({
           embeds: [

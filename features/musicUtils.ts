@@ -230,8 +230,8 @@ export default async (instance: WOK, client: any) => {
                     if (queue.autoplay.state == true) {
                       const song = await client.getRecommendedSong(queue.previous);
                       if (song != null) {
-                        song.requester = queue.autoplay.requester;
-                        song.interaction = queue.autoplay.interaction;
+                        song.requester = queue.autoplay?.requester;
+                        song.message = queue.autoplay?.message;
                         if (queue.skipped) queue.skipped = false;
                         if (queue.paused) queue.paused = false;
                         queue.tracks.shift();
@@ -312,15 +312,14 @@ export default async (instance: WOK, client: any) => {
       .setThumbnail(song.image[song.image?.length - 1]?.link);
 
     if (!queue.resumed) {
-      const msg: Message = await song.interaction.fetchReply().catch(() => null);
       if (queue.previous) {
-        await msg.reply({
+        await song.message?.reply({
           embeds: [songEmbed],
           failIfNotExists: false
         }).catch(() => null);
       }
       else {
-        msg?.edit({
+        song.message?.edit({
           embeds: [
             songEmbed
           ]
@@ -345,7 +344,7 @@ export default async (instance: WOK, client: any) => {
       queueloop: false,
       autoplay: {
         state: false,
-        interaction: CommandInteraction,
+        message: Message,
         requester: User
       },
       tracks: [client.createSong(song, user)],
