@@ -9,7 +9,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Resumes the Currently Playing Song on this Server",
+  description: "Resumes the Currently Playing Track on this Server",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,

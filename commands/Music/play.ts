@@ -21,7 +21,7 @@ export default {
   options: [
     {
       name: "query",
-      description: "The song to search for and play",
+      description: "The track to search for and play",
       required: true,
       type: ApplicationCommandOptionType.String,
     },
@@ -132,14 +132,14 @@ export default {
         queue = undefined;
       }
 
-      song = await int.client.getSong(int.options?.get("query")?.value as string);
+      song = await int.client.getSong(int.options?.getString("query") as string);
       song.requester = int.user;
       song.message = await int.fetchReply().catch(() => null);
       if (!song || !song?.downloadUrl) {
         return await m.edit({
           embeds: [
             new EmbedBuilder()
-              .setDescription(`**❌ No songs were found for the provided query**`)
+              .setDescription(`**❌ No tracks were found for the provided query**`)
               .setColor(11553764)
           ],
         }).catch(() => null);

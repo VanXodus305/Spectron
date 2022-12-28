@@ -9,7 +9,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Showes the Currently Playing Song on this Server",
+  description: "Shows the Currently Playing Track on this Server",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
@@ -22,7 +22,7 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor(11553764)
-              .setDescription("**⚠️ There are no songs currently playing on this server**")
+              .setDescription("**⚠️ There are no tracks currently playing on this server**")
           ],
           ephemeral: true
         }).catch(() => null);

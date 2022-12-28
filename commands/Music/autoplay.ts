@@ -10,7 +10,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Automatically play Recommended Songs after the Queue ends",
+  description: "Automatically Play Recommended Tracks after the Queue ends",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
@@ -41,7 +41,7 @@ export default {
         return await int.reply({
           embeds: [
             new EmbedBuilder()
-              .setDescription('**⚠️ There are no songs currently playing on this server**')
+              .setDescription('**⚠️ There are no tracks currently playing on this server**')
               .setColor(11553764)
           ],
           ephemeral: true
@@ -65,13 +65,13 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor(11553764)
-              .setDescription("**⚠️ There are no songs currently playing on this server**")
+              .setDescription("**⚠️ There are no tracks currently playing on this server**")
           ],
           ephemeral: true
         }).catch(() => null);
       }
 
-      if (int.options?.get("choice")?.value == true) {
+      if (int.options?.getBoolean("choice") == true) {
         if (queue.autoplay.state == true) {
           return await int.reply({
             embeds: [
@@ -97,7 +97,7 @@ export default {
         return;
       }
 
-      if (int.options?.get("choice")?.value == false) {
+      if (int.options?.getBoolean("choice") == false) {
         if (queue.autoplay.state == false) {
           return await int.reply({
             embeds: [

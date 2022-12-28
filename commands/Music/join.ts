@@ -3,7 +3,7 @@ import { ChannelType, EmbedBuilder, Interaction } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 
 export default {
-  description: "Joins a Voice or Stage Channel",
+  description: "Joins a Voice/Stage Channel",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
