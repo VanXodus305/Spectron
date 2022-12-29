@@ -16,19 +16,6 @@ export default {
   guildOnly: true,
   options: [
     {
-      name: 'track',
-      description: 'Loops the Currently Playing Track',
-      type: ApplicationCommandOptionType.Subcommand,
-      options: [
-        {
-          name: 'choice',
-          type: ApplicationCommandOptionType.Boolean,
-          description: 'Enable/Disable Loop for the Currrent Track',
-          required: true
-        }
-      ]
-    },
-    {
       name: 'queue',
       description: 'Loops the Currently Playing Queue',
       type: ApplicationCommandOptionType.Subcommand,
@@ -37,6 +24,19 @@ export default {
           name: 'choice',
           type: ApplicationCommandOptionType.Boolean,
           description: 'Enable/Disable Loop for the Currrent Queue',
+          required: true
+        }
+      ]
+    },
+    {
+      name: 'track',
+      description: 'Loops the Currently Playing Track',
+      type: ApplicationCommandOptionType.Subcommand,
+      options: [
+        {
+          name: 'choice',
+          type: ApplicationCommandOptionType.Boolean,
+          description: 'Enable/Disable Loop for the Currrent Track',
           required: true
         }
       ]

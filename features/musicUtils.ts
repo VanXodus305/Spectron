@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, Message, Snowflake, User, VoiceBasedChannel } from 'discord.js';
+import { EmbedBuilder, Message, Snowflake, User, VoiceBasedChannel } from 'discord.js';
 import { joinVoiceChannel, getVoiceConnection, VoiceConnectionStatus, entersState, createAudioResource, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus } from "@discordjs/voice";
 import fetch from "cross-fetch";
 import WOK from 'wokcommands';
@@ -39,7 +39,7 @@ export default async (instance: WOK, client: any) => {
 
   client.getRecommendedSong = async (reference: any) => {
     try {
-      const result: any = await fetch(`${process.env.Song_API_URL}/artists/${reference.primaryArtistsId?.split(',\\s*')[0]}/recommendations/${reference.id}`,
+      const result: any = await fetch(`${process.env.Song_API_URL}/artists/${reference.primaryArtistsId?.split(',')[0].trim()}/recommendations/${reference.id}`,
         {
           method: "GET",
           headers: {
@@ -51,7 +51,7 @@ export default async (instance: WOK, client: any) => {
         const songs = await result.json().catch(() => null);
         if (songs?.data[0]) {
           songs.data.sort(() => {
-            return (Math.random() > .5) ? 1 : -1
+            return (Math.random() > .5) ? 1 : -1;
           });
         }
         const song = songs.data.find((song: any) => song.downloadUrl != false);
