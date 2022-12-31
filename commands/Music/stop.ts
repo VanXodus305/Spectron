@@ -62,6 +62,10 @@ export default {
         }).catch(() => null);
       }
 
+      if (queue.autoplay == true) queue.autoplay = false;
+      if (queue.queueloop == true) queue.queueloop = false;
+      if (queue.trackloop == true) queue.trackloop = false;
+
       queue.tracks = [];
       oldConnection.state.subscription.player.stop();
 
