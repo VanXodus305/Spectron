@@ -93,8 +93,7 @@ export default {
             new EmbedBuilder()
               .setColor(11553764)
               .setDescription("**✅ Successfully cleared the queue**")
-          ],
-          ephemeral: true
+          ]
         }).catch(() => null);
       }
 

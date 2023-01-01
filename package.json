@@ -25,7 +25,6 @@
     "erlpack": "github:discord/erlpack",
     "express": "*",
     "ffmpeg-static": "*",
-    "form-data": "*",
     "sodium-native": "*",
     "ts-node": "*",
     "utf-8-validate": "*",
