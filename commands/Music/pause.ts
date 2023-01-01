@@ -9,7 +9,7 @@ config();
 
 export default {
   category: "Music",
-  description: "Pauses the Currently Playing Track on this Server",
+  description: "Pauses the Currently Playing Track on the Server",
   type: CommandType.SLASH,
   testOnly: false,
   guildOnly: true,
@@ -32,7 +32,7 @@ export default {
         return await int.reply({
           embeds: [
             new EmbedBuilder()
-              .setDescription('**⚠️ There are no tracks currently playing on this server**')
+              .setDescription('**⚠️ There are no tracks currently playing on the server**')
               .setColor(11553764)
           ],
           ephemeral: true
@@ -56,7 +56,7 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor(11553764)
-              .setDescription("**⚠️ There are no tracks currently playing on this server**")
+              .setDescription("**⚠️ There are no tracks currently playing on the server**")
           ],
           ephemeral: true
         }).catch(() => null);
