@@ -1,12 +1,28 @@
-import { EmbedBuilder, Message, Snowflake, User, VoiceBasedChannel } from 'discord.js';
-import { joinVoiceChannel, getVoiceConnection, VoiceConnectionStatus, entersState, createAudioResource, createAudioPlayer, NoSubscriberBehavior, AudioPlayerStatus } from "@discordjs/voice";
+import {
+  EmbedBuilder,
+  Message,
+  Snowflake,
+  User,
+  VoiceBasedChannel,
+} from "discord.js";
+import {
+  joinVoiceChannel,
+  getVoiceConnection,
+  VoiceConnectionStatus,
+  entersState,
+  createAudioResource,
+  createAudioPlayer,
+  NoSubscriberBehavior,
+  AudioPlayerStatus,
+} from "@discordjs/voice";
 import fetch from "cross-fetch";
-import WOK from 'wokcommands';
+import WOK from "wokcommands";
 
 export default async (instance: WOK, client: any) => {
   client.getSong = async (query: string) => {
     try {
-      const result: any = await fetch(`${process.env.Song_API_URL}/search/songs?query=${query}&limit=1`,
+      const result: any = await fetch(
+        `${process.env.Song_API_URL}/search/songs?query=${query}&limit=1`,
         {
           method: "GET",
           headers: {
@@ -17,15 +33,15 @@ export default async (instance: WOK, client: any) => {
       if (result.status == 200) {
         const songs = await result.json().catch(() => null);
         if (songs.data?.results[0]) {
-          const song = songs.data.results.find((song: any) => song.downloadUrl != false);
+          const song = songs.data.results.find(
+            (song: any) => song.downloadUrl != false
+          );
           if (song != undefined) {
             return song;
-          }
-          else {
+          } else {
             return null;
           }
-        }
-        else {
+        } else {
           return null;
         }
       } else {
@@ -35,11 +51,14 @@ export default async (instance: WOK, client: any) => {
       console.error(error);
       return null;
     }
-  }
+  };
 
   client.getRecommendedSong = async (reference: any) => {
     try {
-      const result: any = await fetch(`${process.env.Song_API_URL}/artists/${reference.primaryArtistsId?.split(',')[0].trim()}/recommendations/${reference.id}`,
+      const result: any = await fetch(
+        `${process.env.Song_API_URL}/artists/${reference.primaryArtistsId
+          ?.split(",")[0]
+          .trim()}/recommendations/${reference.id}`,
         {
           method: "GET",
           headers: {
@@ -51,14 +70,13 @@ export default async (instance: WOK, client: any) => {
         const songs = await result.json().catch(() => null);
         if (songs?.data[0]) {
           songs.data.sort(() => {
-            return (Math.random() > .5) ? 1 : -1;
+            return Math.random() > 0.5 ? 1 : -1;
           });
         }
         const song = songs.data.find((song: any) => song.downloadUrl != false);
         if (song != undefined) {
           return song;
-        }
-        else {
+        } else {
           return null;
         }
       } else {
@@ -68,56 +86,67 @@ export default async (instance: WOK, client: any) => {
       console.error(error);
       return null;
     }
-  }
+  };
 
   client.joinVoiceChannel = async (channel: VoiceBasedChannel) => {
     return new Promise(async (res, rej) => {
       const oldConnection = getVoiceConnection(channel.guild.id);
       if (oldConnection) {
-        return rej(
-          {
-            embeds: [
-              new EmbedBuilder()
-                .setDescription(`**⚠️ I'm already connected in <#${oldConnection.joinConfig.channelId}>**`)
-                .setColor(11553764)
-            ],
-            ephemeral: true
-          }
-        );
+        return rej({
+          embeds: [
+            new EmbedBuilder()
+              .setDescription(
+                `**⚠️ I'm already connected in <#${oldConnection.joinConfig.channelId}>**`
+              )
+              .setColor(11553764),
+          ],
+          ephemeral: true,
+        });
       }
 
       const newConnection = joinVoiceChannel({
         channelId: channel.id,
         guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator
+        adapterCreator: channel.guild.voiceAdapterCreator,
       });
 
       await client.delay(250);
 
-      newConnection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-        try {
-          await Promise.race([
-            entersState(newConnection, VoiceConnectionStatus.Signalling, 5_000),
-            entersState(newConnection, VoiceConnectionStatus.Connecting, 5_000),
-          ]);
-        } catch (error) {
-          newConnection.destroy();
+      newConnection.on(
+        VoiceConnectionStatus.Disconnected,
+        async (oldState, newState) => {
+          try {
+            await Promise.race([
+              entersState(
+                newConnection,
+                VoiceConnectionStatus.Signalling,
+                5_000
+              ),
+              entersState(
+                newConnection,
+                VoiceConnectionStatus.Connecting,
+                5_000
+              ),
+            ]);
+          } catch (error) {
+            newConnection.destroy();
+          }
         }
-      });
+      );
 
       newConnection.on(VoiceConnectionStatus.Destroyed, () => {
-        client.queues.delete(channel.guild.id)
+        client.queues.delete(channel.guild.id);
       });
 
       return res({
         embeds: [
           new EmbedBuilder()
             .setDescription(`**✅ Successfully joined <#${channel.id}>**`)
-            .setColor(11553764)
+            .setColor(11553764),
         ],
       });
     });
-  }
+  };
 
   client.leaveVoiceChannel = async (channel: VoiceBasedChannel) => {
     return new Promise(async (res, rej) => {
@@ -135,13 +164,15 @@ export default async (instance: WOK, client: any) => {
         return rej({
           embeds: [
             new EmbedBuilder()
-              .setDescription(`**⚠️ I'm not connected in any Voice/Stage Channel**`)
-              .setColor(11553764)
+              .setDescription(
+                `**⚠️ I'm not connected in any Voice/Stage Channel**`
+              )
+              .setColor(11553764),
           ],
         });
       }
     });
-  }
+  };
 
   client.getResource = (queue: any, songInfo: any) => {
     const url = songInfo.downloadUrl;
@@ -150,26 +181,26 @@ export default async (instance: WOK, client: any) => {
       inlineVolume: false,
       metadata: {
         details: songInfo,
-      }
+      },
     });
     return resource;
-  }
+  };
 
   client.playSong = async (channel: VoiceBasedChannel, songInfo: any) => {
     return new Promise(async (res, rej) => {
       const oldConnection = getVoiceConnection(channel.guild.id);
       if (oldConnection) {
         if (oldConnection.joinConfig.channelId != channel.id) {
-          return rej(
-            {
-              embeds: [
-                new EmbedBuilder()
-                  .setDescription(`**⚠️ I'm already connected in <#${oldConnection.joinConfig.channelId}>**`)
-                  .setColor(11553764)
-              ],
-              ephemeral: true
-            }
-          );
+          return rej({
+            embeds: [
+              new EmbedBuilder()
+                .setDescription(
+                  `**⚠️ I'm already connected in <#${oldConnection.joinConfig.channelId}>**`
+                )
+                .setColor(11553764),
+            ],
+            ephemeral: true,
+          });
         }
         try {
           const curQueue = client.queues.get(channel.guild.id);
@@ -193,7 +224,7 @@ export default async (instance: WOK, client: any) => {
             handleQueue(queue);
           });
 
-          player.on('error', error => {
+          player.on("error", (error) => {
             console.error(error);
             const queue = client.queues.get(channel.guild.id);
             handleQueue(queue);
@@ -207,7 +238,7 @@ export default async (instance: WOK, client: any) => {
                   queue.previous = queue.tracks[0];
                   if (queue.trackloop && !queue.skipped) {
                     if (queue.paused) queue.paused = false;
-                    player.play(client.getResource(queue, queue.tracks[0]))
+                    player.play(client.getResource(queue, queue.tracks[0]));
                   } else if (queue.queueloop && !queue.skipped) {
                     const firstSong = queue.tracks.shift();
                     queue.tracks.push(firstSong);
@@ -219,33 +250,32 @@ export default async (instance: WOK, client: any) => {
                     queue.tracks.shift();
                     player.play(client.getResource(queue, queue.tracks[0]));
                   }
-                }
-
-                else if (queue && queue.tracks && queue.tracks.length <= 1) {
+                } else if (queue && queue.tracks && queue.tracks.length <= 1) {
                   queue.previous = queue.tracks[0];
-                  if (queue.trackloop || queue.queueloop && !queue.skipped) {
+                  if (queue.trackloop || (queue.queueloop && !queue.skipped)) {
                     player.play(client.getResource(queue, queue.tracks[0]));
-                  }
-                  else {
+                  } else {
                     if (queue.autoplay.state == true) {
-                      const song = await client.getRecommendedSong(queue.previous);
+                      const song = await client.getRecommendedSong(
+                        queue.previous
+                      );
                       if (song != null) {
                         song.requester = queue.autoplay?.requester;
                         song.message = queue.autoplay?.message;
                         if (queue.skipped) queue.skipped = false;
                         if (queue.paused) queue.paused = false;
                         queue.tracks.shift();
-                        queue.tracks.push(client.createSong(song, songInfo.requester));
+                        queue.tracks.push(
+                          client.createSong(song, songInfo.requester)
+                        );
                         player.play(client.getResource(queue, queue.tracks[0]));
-                      }
-                      else {
+                      } else {
                         if (queue.skipped) {
                           queue.skipped = false;
                         }
                         queue.tracks = [];
                       }
-                    }
-                    else {
+                    } else {
                       if (queue.skipped) {
                         queue.skipped = false;
                       }
@@ -263,26 +293,33 @@ export default async (instance: WOK, client: any) => {
           console.error(e);
           return rej(e);
         }
-      }
-      else {
-        return rej(
-          {
-            embeds: [
-              new EmbedBuilder()
-                .setDescription(`**⚠️ I'm not connected in any Voice/Stage Channel**`)
-                .setColor(11553764)
-            ],
-            ephemeral: true
-          }
-        );
+      } else {
+        return rej({
+          embeds: [
+            new EmbedBuilder()
+              .setDescription(
+                `**⚠️ I'm not connected in any Voice/Stage Channel**`
+              )
+              .setColor(11553764),
+          ],
+          ephemeral: true,
+        });
       }
     });
-  }
+  };
 
   client.sendQueueUpdate = async (channel: VoiceBasedChannel) => {
     const queue = client.queues.get(channel.guildId);
-    if (!queue || !queue.tracks || queue.tracks.length == 0 || !queue.textChannel) return;
-    const textChannel = client.channels.cache.get(queue.textChannel) || await client.channels.fetch(queue.textChannel).catch(() => null);
+    if (
+      !queue ||
+      !queue.tracks ||
+      queue.tracks.length == 0 ||
+      !queue.textChannel
+    )
+      return;
+    const textChannel =
+      client.channels.cache.get(queue.textChannel) ||
+      (await client.channels.fetch(queue.textChannel).catch(() => null));
     if (!textChannel) return;
 
     const song = queue.tracks[0];
@@ -301,7 +338,10 @@ export default async (instance: WOK, client: any) => {
       })
       .addFields({
         name: "🕒 Duration",
-        value: "```\n" + client.formatDuration(client.decodeHTMLEntities(song.duration)) + "```",
+        value:
+          "```\n" +
+          client.formatDuration(client.decodeHTMLEntities(song.duration)) +
+          "```",
         inline: true,
       })
       .addFields({
@@ -313,26 +353,27 @@ export default async (instance: WOK, client: any) => {
 
     if (!queue.resumed) {
       if (queue.previous) {
-        await song.message?.reply({
-          embeds: [songEmbed],
-          failIfNotExists: false
-        }).catch(() => null);
-      }
-      else {
-        song.message?.edit({
-          embeds: [
-            songEmbed
-          ]
-        }).catch(() => null);
+        await song.message
+          ?.reply({
+            embeds: [songEmbed],
+            failIfNotExists: false,
+          })
+          .catch(() => null);
+      } else {
+        song.message
+          ?.edit({
+            embeds: [songEmbed],
+          })
+          .catch(() => null);
       }
     } else {
       queue.resumed = false;
     }
-  }
+  };
 
   client.createSong = (song: any, requester: User) => {
-    return { ...song, requester }
-  }
+    return { ...song, requester };
+  };
 
   client.createQueue = (song: any, user: User, channelId: Snowflake) => {
     return {
@@ -345,25 +386,26 @@ export default async (instance: WOK, client: any) => {
       autoplay: {
         state: false,
         message: Message,
-        requester: User
+        requester: User,
       },
       tracks: [client.createSong(song, user)],
       previous: undefined,
       creator: user,
-    }
-  }
+    };
+  };
 
   client.createBar = (duration: number, position: number) => {
     try {
       const full = "▰";
       const empty = "▱";
       const size = 15;
-      const percent: any = duration == 0 ? null : Math.floor(position / duration * 100)
+      const percent: any =
+        duration == 0 ? null : Math.floor((position / duration) * 100);
       const fullBars = Math.round(size * (percent / 100));
       const emptyBars = size - fullBars;
       return `${full.repeat(fullBars)}${empty.repeat(emptyBars)}`;
     } catch (e) {
       console.error(e);
     }
-  }
-}
+  };
+};

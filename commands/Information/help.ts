@@ -1,4 +1,9 @@
-import { ApplicationCommand, ApplicationCommandOption, EmbedBuilder, Interaction } from "discord.js";
+import {
+  ApplicationCommand,
+  ApplicationCommandOption,
+  EmbedBuilder,
+  Interaction,
+} from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 
 export default {
@@ -8,40 +13,44 @@ export default {
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
     try {
-      let description = '>>> ';
+      let description = ">>> ";
       int.client.commands?.forEach((cmd: ApplicationCommand) => {
-        let subcommand = '';
+        let subcommand = "";
         cmd.options?.forEach((option: ApplicationCommandOption) => {
           if (option?.type == 1) {
-           subcommand += `**</${cmd.name} ${option?.name}:${cmd.id}> - \`${option?.description}\`**\n`;
+            subcommand += `**</${cmd.name} ${option?.name}:${cmd.id}> - \`${option?.description}\`**\n`;
           }
         });
-        if (subcommand == '') {
+        if (subcommand == "") {
           description += `**</${cmd.name}:${cmd.id}> - \`${cmd.description}\`**\n`;
-        }
-        else {
+        } else {
           description += subcommand;
-        }        
+        }
       });
-      await int.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setTitle(`List of Commands`)
-            .setDescription(description)
-            .setColor(11553764)
-        ],
-        ephemeral: true
-      }).catch(() => null);
-    }
-    catch (error) {
+      await int
+        .reply({
+          embeds: [
+            new EmbedBuilder()
+              .setTitle(`List of Commands`)
+              .setDescription(description)
+              .setColor(11553764),
+          ],
+          ephemeral: true,
+        })
+        .catch(() => null);
+    } catch (error) {
       console.error(error);
-      await int.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setColor(11553764)
-            .setDescription("**❌ Something went wrong while executing that command**")
-        ],
-      }).catch(() => null);
+      await int
+        .reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(11553764)
+              .setDescription(
+                "**❌ Something went wrong while executing that command**"
+              ),
+          ],
+        })
+        .catch(() => null);
     }
-  }
+  },
 } as CommandObject;

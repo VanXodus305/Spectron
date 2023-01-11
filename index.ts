@@ -6,7 +6,7 @@ require("dotenv/config");
 const client: any = new Client({
   intents: ["Guilds", "GuildMessages", "GuildMembers", "GuildVoiceStates"],
   failIfNotExists: false,
-  shards: "auto"
+  shards: "auto",
 });
 
 client.on("ready", () => {
@@ -17,7 +17,7 @@ client.on("ready", () => {
     testServers: ["751683524171530331", "746313837049020517"],
     disabledDefaultCommands: [
       DefaultCommands.CustomCommand,
-      DefaultCommands.Prefix
+      DefaultCommands.Prefix,
     ],
     events: {
       dir: path.join(__dirname, "events"),

@@ -1,5 +1,5 @@
-import { ApplicationCommand, Collection, CommandInteraction } from 'discord.js';
-import WOK from 'wokcommands';
+import { ApplicationCommand, Collection, CommandInteraction } from "discord.js";
+import WOK from "wokcommands";
 
 export default async (instance: WOK, client: any) => {
   client.queues = new Collection();
@@ -14,19 +14,22 @@ export default async (instance: WOK, client: any) => {
     if (sf) {
       var display = "";
       display = d > 0 ? d + ":" : "";
-      display = display != "" ? display + h + ":" : display + (h > 0 ? h + ":" : "");
-      display = display != "" ? display + (m < 10 ? "0" + m + ":" : "m" + ":") : display + m + ":";
+      display =
+        display != "" ? display + h + ":" : display + (h > 0 ? h + ":" : "");
+      display =
+        display != ""
+          ? display + (m < 10 ? "0" + m + ":" : "m" + ":")
+          : display + m + ":";
       display = display + (s < 10 ? "0" + s : s);
       return display;
-    }
-    else {
+    } else {
       var dDisplay = d > 0 ? d + (d == 1 ? " day " : " days ") : "";
       var hDisplay = h > 0 ? h + (h == 1 ? " hour " : " hours ") : "";
       var mDisplay = m > 0 ? m + (m == 1 ? " minute " : " minutes ") : "";
       var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
       return dDisplay + hDisplay + mDisplay + sDisplay;
     }
-  }
+  };
 
   client.decodeHTMLEntities = (text: string) => {
     var entities = [
@@ -47,16 +50,20 @@ export default async (instance: WOK, client: any) => {
         entities[i][1]
       );
     return text;
-  }
+  };
 
   client.delay = (ms: number) => {
-    return new Promise(r => setTimeout(() => r(2), ms));
-  }
+    return new Promise((r) => setTimeout(() => r(2), ms));
+  };
 
-  client.commands = await client.application?.commands?.fetch({
-    withLocalizations: true
-  }).catch(() => null);
-  client.commands = client.commands.sort((a: ApplicationCommand, b: ApplicationCommand) => {
-    return a.name.localeCompare(b.name);
-  });
-}
+  client.commands = await client.application?.commands
+    ?.fetch({
+      withLocalizations: true,
+    })
+    .catch(() => null);
+  client.commands = client.commands.sort(
+    (a: ApplicationCommand, b: ApplicationCommand) => {
+      return a.name.localeCompare(b.name);
+    }
+  );
+};
