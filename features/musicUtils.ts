@@ -30,7 +30,8 @@ export default async (instance: WOK, client: any) => {
           },
         }
       ).catch(() => null);
-      if (result.status == 200) {
+
+      if (result?.status == 200) {
         const songs = await result.json().catch(() => null);
         if (songs.data?.results[0]) {
           const song = songs.data.results.find(

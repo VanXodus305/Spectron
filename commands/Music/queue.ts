@@ -135,7 +135,9 @@ export default {
           position = `\`${queue.tracks?.indexOf(song)}\``;
           requester = `<@${song.requester?.id}>`;
           name = `\`${song.name}\``;
-          description += `**#${position}: ${name} - ${requester}**\n`;
+          if (queue.tracks?.indexOf(song) <= 20) {
+            description += `**#${position}: ${name} - ${requester}**\n`;
+          }
         });
         return await int
           .reply({
