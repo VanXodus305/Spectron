@@ -56,30 +56,14 @@ export default async (instance: WOK, client: any) => {
 
   client.getRecommendedSong = async (reference: any) => {
     try {
-      const result: any = await fetch(
-        `${process.env.Song_API_URL}/artists/${reference.primaryArtistsId
-          ?.split(",")[0]
-          .trim()}/recommendations/${reference.id}`,
-        {
-          method: "GET",
-          headers: {
-            "content-type": "application/json",
-          },
-        }
-      ).catch(() => null);
-      if (result.status == 200) {
-        const songs = await result.json().catch(() => null);
-        if (songs?.data[0]) {
-          songs.data.sort(() => {
-            return Math.random() > 0.5 ? 1 : -1;
-          });
-        }
-        const song = songs.data.find((song: any) => song.downloadUrl != false);
-        if (song != undefined) {
-          return song;
-        } else {
-          return null;
-        }
+      let query = reference?.name + " ";
+      query += reference.primaryArtists?.replace(",", "");
+      const recommendation: string = await client.getSpotifyRecommendation(
+        query
+      );
+      const result: any = await client.getSong(recommendation);
+      if (result != null) {
+        return result;
       } else {
         return null;
       }

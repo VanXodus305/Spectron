@@ -2,6 +2,57 @@ import WOK from "wokcommands";
 import fetch from "cross-fetch";
 
 export default async (instance: WOK, client: any) => {
+  client.getSpotifyRecommendation = async (query: String) => {
+    try {
+      let searchResult: any = await fetch(
+        `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + client.spotifyToken,
+          },
+        }
+      ).catch(() => null);
+      searchResult = await searchResult?.json().catch(() => null);
+      searchResult = searchResult.tracks?.items[0];
+      let spotifyArtistsID = "";
+      searchResult?.artists?.forEach((artist: any) => {
+        if (searchResult?.artists?.indexOf(artist) < 4) {
+          spotifyArtistsID += artist.id + ",";
+        }
+      });
+
+      let spotifyTrack: any = await fetch(
+        `https://api.spotify.com/v1/recommendations?seed_artists=${spotifyArtistsID}&seed_tracks=${searchResult.id}&min_popularity=75`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + client.spotifyToken,
+          },
+        }
+      ).catch(() => null);
+      spotifyTrack = await spotifyTrack?.json().catch(() => null);
+      spotifyTrack =
+        spotifyTrack?.tracks[
+          Math.floor(Math.random() * spotifyTrack?.tracks?.length)
+        ];
+      let spotifyArtists = "";
+      spotifyTrack?.artists?.forEach(
+        (artist: any) => (spotifyArtists += " " + artist.name)
+      );
+      if (spotifyTrack?.name.toLowerCase().includes("remix")) {
+        query = spotifyTrack?.name.replace("(", "").replace(")", "");
+      } else {
+        query = spotifyTrack?.name.replace(/\([^()]*\)/g, "") + spotifyArtists;
+      }
+      query = query.replace(/[^a-zA-Z0-9 ]/g, "");
+      return query;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   client.getSpotifyTrack = async (query: String) => {
     try {
       const trackID = query.substring(
@@ -17,7 +68,7 @@ export default async (instance: WOK, client: any) => {
           },
         }
       ).catch(() => null);
-      spotifyTrack = await spotifyTrack.json().catch(() => null);
+      spotifyTrack = await spotifyTrack?.json().catch(() => null);
       let spotifyArtists = "";
       spotifyTrack?.artists?.forEach(
         (artist: any) => (spotifyArtists += " " + artist.name)
@@ -52,7 +103,7 @@ export default async (instance: WOK, client: any) => {
         }
       ).catch(() => null);
       spotifyPlaylistTracks = await spotifyPlaylistTracks
-        .json()
+        ?.json()
         .catch(() => null);
       let songList = new Array();
       spotifyPlaylistTracks?.items?.forEach((item: any) => {
