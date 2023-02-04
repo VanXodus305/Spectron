@@ -17,8 +17,16 @@ export default {
   options: [
     {
       name: "clear",
-      description: "Removes All Tracks from the Current Queue",
+      description: "Removes a Specified or All Tracks from the Current Queue",
       type: ApplicationCommandOptionType.Subcommand,
+      options: [
+        {
+          name: "track",
+          description: "Index of the Track to Remove from the Queue",
+          type: ApplicationCommandOptionType.Number,
+          required: false,
+        },
+      ],
     },
     {
       name: "view",
@@ -114,16 +122,54 @@ export default {
       }
 
       if (int.options?.getSubcommand() == "clear") {
-        queue.tracks = [queue.tracks[0]];
-        return await int
-          .reply({
-            embeds: [
-              new EmbedBuilder()
-                .setColor(11553764)
-                .setDescription("**✅ Successfully cleared the queue**"),
-            ],
-          })
-          .catch(() => null);
+        if (!int.options?.getNumber("track")) {
+          queue.tracks = [queue.tracks[0]];
+          return await int
+            .reply({
+              embeds: [
+                new EmbedBuilder()
+                  .setColor(11553764)
+                  .setDescription("**✅ Successfully cleared the queue**"),
+              ],
+            })
+            .catch(() => null);
+        } else if (
+          int.options?.getNumber("track") >= 1 &&
+          int.options?.getNumber("track") < queue.tracks.length
+        ) {
+          const removed = queue.tracks?.splice(
+            int.options?.getNumber("track"),
+            1
+          );
+          return await int
+            .reply({
+              embeds: [
+                new EmbedBuilder()
+                  .setColor(11553764)
+                  .setDescription(
+                    `**✅ Successfully removed \`${int.client.decodeHTMLEntities(
+                      removed[0]?.name
+                    )}\` from the queue**`
+                  ),
+              ],
+            })
+            .catch(() => null);
+        } else {
+          return await int
+            .reply({
+              embeds: [
+                new EmbedBuilder()
+                  .setColor(11553764)
+                  .setDescription(
+                    `**⚠️ No track is queued at Position - \`${int.options?.getNumber(
+                      "track"
+                    )}\`**`
+                  ),
+              ],
+              ephemeral: true,
+            })
+            .catch(() => null);
+        }
       }
 
       if (int.options?.getSubcommand() == "view") {
