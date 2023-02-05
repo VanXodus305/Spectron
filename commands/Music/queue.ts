@@ -1,5 +1,10 @@
 import {
+  ActionRowBuilder,
   ApplicationCommandOptionType,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  ComponentType,
   EmbedBuilder,
   Interaction,
 } from "discord.js";
@@ -173,29 +178,103 @@ export default {
       }
 
       if (int.options?.getSubcommand() == "view") {
-        let description = ">>> ";
-        let position = "";
-        let requester = "";
-        let name = "";
-        queue.tracks?.slice(1).forEach((song: any) => {
-          position = `\`${queue.tracks?.indexOf(song)}\``;
-          requester = `<@${song.requester?.id}>`;
-          name = `\`${song.name}\``;
-          if (queue.tracks?.indexOf(song) <= 20) {
+        const pages = Math.ceil(queue.tracks?.length / 15);
+        const embeds: EmbedBuilder[] = [];
+        for (let a = 0; a < pages; ++a) {
+          let description = ">>> ";
+          let position = "";
+          let requester = "";
+          let name = "";
+          queue.tracks?.slice(a * 15 + 1, a * 15 + 16).forEach((song: any) => {
+            position = `\`${queue.tracks?.indexOf(song)}\``;
+            requester = `<@${song.requester?.id}>`;
+            name = `\`${int.client?.decodeHTMLEntities(song.name)}\``;
             description += `**#${position}: ${name} - ${requester}**\n`;
+          });
+          embeds.push(
+            new EmbedBuilder()
+              .setColor(11553764)
+              .setDescription(description)
+              .setTitle("List of Queued Tracks")
+              .setFooter({
+                text: `Page: ${a + 1}/${pages} (#${a * 15 + 1} - #${
+                  a * 15 + 15
+                })`,
+              })
+          );
+        }
+
+        const getRow = (page: number) => {
+          const row = new ActionRowBuilder();
+          if (page != 0) {
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId(`queue_prev_${int.id}`)
+                .setStyle(ButtonStyle.Success)
+                .setLabel(`Page: ${page}`)
+                .setEmoji("⬅️")
+            );
           }
-        });
-        return await int
+          if (page != embeds.length - 1) {
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId(`queue_next_${int.id}`)
+                .setStyle(ButtonStyle.Success)
+                .setLabel(`Page: ${page + 2}`)
+                .setEmoji("➡️")
+            );
+          }
+          return row;
+        };
+
+        let page = 0;
+        const embed = embeds[page];
+        const filter = (i: Interaction) => i.user.id == int.user?.id;
+
+        console.log(getRow(page));
+
+        await int
           .reply({
-            embeds: [
-              new EmbedBuilder()
-                .setColor(11553764)
-                .setDescription(`${description}`)
-                .setTitle("List of Queued Tracks"),
-            ],
+            embeds: [embed],
+            components: getRow(page).components[0] ? [getRow(page)] : null,
             ephemeral: true,
           })
           .catch(() => null);
+
+        let collector: any = int.channel?.createMessageComponentCollector({
+          filter,
+          time: 1000 * 60 * 5,
+          idle: 1000 * 60,
+          componentType: ComponentType.Button,
+        });
+
+        collector.on("collect", async (btnInt: ButtonInteraction) => {
+          if (!btnInt) {
+            return;
+          }
+          await btnInt.deferUpdate().catch(() => null);
+          if (
+            btnInt.customId != `queue_prev_${int.id}` &&
+            btnInt.customId != `queue_next_${int.id}`
+          ) {
+            return;
+          }
+          if (btnInt.customId == `queue_prev_${int.id}` && page > 0) {
+            --page;
+          } else if (
+            btnInt.customId == `queue_next_${int.id}` &&
+            page < embeds.length - 1
+          ) {
+            ++page;
+          }
+
+          await int
+            .editReply({
+              embeds: [embeds[page]],
+              components: [getRow(page)],
+            })
+            .catch(() => null);
+        });
       }
     } catch (error) {
       console.error(error);

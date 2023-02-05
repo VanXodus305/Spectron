@@ -16,19 +16,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/opus": "*",
-    "@discordjs/voice": "*",
-    "bufferutil": "*",
-    "cross-fetch": "*",
-    "discord.js": "*",
-    "dotenv": "*",
+    "@discordjs/opus": "latest",
+    "@discordjs/voice": "latest",
+    "bufferutil": "latest",
+    "cross-fetch": "latest",
+    "discord.js": "latest",
+    "dotenv": "latest",
     "erlpack": "github:discord/erlpack",
-    "express": "*",
-    "ffmpeg-static": "*",
-    "sodium": "*",
-    "ts-node": "*",
-    "utf-8-validate": "*",
-    "wokcommands": "*",
-    "zlib-sync": "*"
+    "express": "latest",
+    "ffmpeg-static": "latest",
+    "sodium": "latest",
+    "ts-node": "latest",
+    "utf-8-validate": "latest",
+    "wokcommands": "latest",
+    "zlib-sync": "latest"
   }
 }
