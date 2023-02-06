@@ -4,6 +4,11 @@ import {
   Interaction,
   ChannelType,
   Message,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  ComponentType,
+  StringSelectMenuInteraction,
 } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import { CommandObject, CommandType } from "wokcommands";
@@ -22,6 +27,12 @@ export default {
       description: "The track to search for and play",
       required: true,
       type: ApplicationCommandOptionType.String,
+    },
+    {
+      name: "search",
+      description: "Pick a track from multiple search results",
+      required: false,
+      type: ApplicationCommandOptionType.Boolean,
     },
   ],
   callback: async ({ interaction }: { interaction: Interaction }) => {
@@ -142,7 +153,7 @@ export default {
     }
 
     let song: any = null;
-    let playlist:any = null;
+    let playlist: any = null;
     let playlistSongs: any = [];
 
     if (!oldConnection) {
@@ -197,61 +208,156 @@ export default {
       }
 
       if (playlist == null) {
-        song = await int.client.getSong(query);
-        if (!song || !song?.downloadUrl) {
+        const playSong = async (song: any) => {
+          song.requester = int.user;
+          song.message = await int.fetchReply().catch(() => null);
+
+          if (!queue || queue.tracks.length == 0) {
+            const newQueue = int.client.createQueue(
+              song,
+              int.member.user,
+              int.channelId
+            );
+            int.client.queues?.set(int.guild?.id, newQueue);
+            return await int.client.playSong(int.member.voice?.channel, song);
+          }
+
+          queue.tracks.push(int.client.createSong(song, int.member.user));
           return await m
             .edit({
               embeds: [
                 new EmbedBuilder()
                   .setDescription(
-                    `**❌ No tracks were found for \`${int.options?.getString(
-                      "query"
-                    )}\`**`
+                    `**✅ Successfully queued at Position - \`#${
+                      queue.tracks.length - 1
+                    }\`**`
                   )
-                  .setColor(11553764),
+                  .setColor(11553764)
+                  .addFields({
+                    name: "📀 Song",
+                    value:
+                      "```\n" +
+                      int.client.decodeHTMLEntities(song.name) +
+                      "```",
+                    inline: true,
+                  })
+                  .addFields({
+                    name: "👤 Requester",
+                    value: `<@${int.member.user?.id}>`,
+                    inline: true,
+                  })
+                  .setThumbnail(`${song.image[song.image?.length - 1]?.link}`),
               ],
+              components: [],
             })
             .catch(() => null);
-        }
-        song.requester = int.user;
-        song.message = await int.fetchReply().catch(() => null);
+        };
 
-        if (!queue || queue.tracks.length == 0) {
-          const newQueue = int.client.createQueue(
-            song,
-            int.member.user,
-            int.channelId
-          );
-          int.client.queues?.set(int.guild?.id, newQueue);
-          return await int.client.playSong(int.member.voice?.channel, song);
-        }
+        if (int.options?.getBoolean("search") == true) {
+          const songs = await int.client.searchSong(query);
+          if (!songs) {
+            return await m
+              .edit({
+                embeds: [
+                  new EmbedBuilder()
+                    .setDescription(
+                      `**❌ No tracks were found for \`${int.options?.getString(
+                        "query"
+                      )}\`**`
+                    )
+                    .setColor(11553764),
+                ],
+              })
+              .catch(() => null);
+          }
+          let selectMenu = new StringSelectMenuBuilder()
+            .setCustomId(`track_select_${int.id}`)
+            .setPlaceholder("Select the Track to Play")
+            .setMinValues(1)
+            .setMaxValues(1);
+          const emojis: any = [
+            "1️⃣",
+            "2️⃣",
+            "3️⃣",
+            "4️⃣",
+            "5️⃣",
+            "6️⃣",
+            "7️⃣",
+            "8️⃣",
+            "9️⃣",
+            "🔟",
+          ];
+          songs.forEach((song: any) => {
+            selectMenu.addOptions(
+              new StringSelectMenuOptionBuilder()
+                .setLabel(
+                  int.client?.decodeHTMLEntities(song.name).substring(0, 101)
+                )
+                .setDescription(
+                  int.client
+                    ?.decodeHTMLEntities(song.primaryArtists)
+                    .substring(0, 101)
+                )
+                .setEmoji(emojis[songs.indexOf(song)])
+                .setValue(song.id)
+            );
+          });
 
-        queue.tracks.push(int.client.createSong(song, int.member.user));
-        return await m
-          .edit({
+          await m.edit({
+            components: [
+              new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                selectMenu
+              ),
+            ],
             embeds: [
               new EmbedBuilder()
-                .setDescription(
-                  `**✅ Successfully queued at Position - \`#${
-                    queue.tracks.length - 1
-                  }\`**`
-                )
-                .setColor(11553764)
-                .addFields({
-                  name: "📀 Song",
-                  value:
-                    "```\n" + int.client.decodeHTMLEntities(song.name) + "```",
-                  inline: true,
-                })
-                .addFields({
-                  name: "👤 Requester",
-                  value: `<@${int.member.user?.id}>`,
-                  inline: true,
-                })
-                .setThumbnail(`${song.image[song.image?.length - 1]?.link}`),
+                .setDescription(`**🔍 Search Results for \`${query}\`**`)
+                .setColor(11553764),
             ],
-          })
-          .catch(() => null);
+          });
+
+          const filter = (i: Interaction) => i.user.id == int.user?.id;
+          let collector: any = int.channel?.createMessageComponentCollector({
+            filter,
+            time: 1000 * 60 * 1,
+            componentType: ComponentType.StringSelect,
+            maxComponents: 1,
+          });
+
+          await collector.on(
+            "collect",
+            async (sltInt: StringSelectMenuInteraction) => {
+              if (!sltInt) {
+                return;
+              }
+              await sltInt.deferUpdate().catch(() => null);
+              if (sltInt.customId != `track_select_${int.id}`) {
+                return;
+              } else {
+                song = songs.find((song: any) => song.id == sltInt.values[0]);
+                await playSong(song);
+              }
+            }
+          );
+        } else {
+          song = await int.client.getSong(query);
+          if (!song || !song?.downloadUrl) {
+            return await m
+              .edit({
+                embeds: [
+                  new EmbedBuilder()
+                    .setDescription(
+                      `**❌ No tracks were found for \`${int.options?.getString(
+                        "query"
+                      )}\`**`
+                    )
+                    .setColor(11553764),
+                ],
+              })
+              .catch(() => null);
+          }
+          await playSong(song);
+        }
       } else {
         const firstSongIndex = playlistSongs.findIndex(async (s: string) => {
           const track: any = await int.client.getSong(s);
@@ -332,7 +438,7 @@ export default {
               track.message = firstSong.message;
               queue.tracks.push(int.client.createSong(track, int.member.user));
             }
-          }, index * 100);          
+          }, index * 100);
         });
       }
     } catch (e) {

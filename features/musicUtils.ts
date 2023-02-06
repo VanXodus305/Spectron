@@ -54,6 +54,44 @@ export default async (instance: WOK, client: any) => {
     }
   };
 
+  client.searchSong = async (query: string) => {
+    try {
+      let result: any = await fetch(
+        `${process.env.Song_API_URL}/search/songs?query=${query}&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      ).catch(() => null);
+
+      if (result?.status == 200) {
+        result = await result.json().catch(() => null);
+        if (result.data?.results[0]) {
+          let songs: any = [];
+          result.data?.results?.forEach((song: any) => {
+            if (song.downloadUrl != false) {
+              songs.push(song);
+            }
+          });
+          if (songs[0] != undefined) {
+            return songs;
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   client.getRecommendedSong = async (reference: any) => {
     try {
       let query = reference?.name + " ";
@@ -348,6 +386,7 @@ export default async (instance: WOK, client: any) => {
         song.message
           ?.edit({
             embeds: [songEmbed],
+            components: [],
           })
           .catch(() => null);
       }
