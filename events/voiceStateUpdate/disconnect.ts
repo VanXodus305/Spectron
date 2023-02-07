@@ -42,8 +42,7 @@ export default async (
           return;
         if (connection && connection.joinConfig.channelId == o.channelId) {
           connection.destroy();
-          const lastInt = o.client.lastInt.get(o.guild.id);
-          const msg: Message = await lastInt?.fetchReply().catch(() => null);
+          const msg: Message = o.client.lastInt.get(o.guild.id);
           await msg
             .reply({
               embeds: [
@@ -56,7 +55,7 @@ export default async (
             })
             .catch(() => null);
         }
-      }, 30 * 1000);
+      }, 60 * 1000);
       return;
     }
   } catch (error) {

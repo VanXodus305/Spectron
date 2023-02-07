@@ -37,7 +37,6 @@ export default {
   ],
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
-    int.client.lastInt?.set(int.guild?.id, int);
 
     if (!int.member?.voice?.channel) {
       return await int
@@ -189,6 +188,7 @@ export default {
         })
         .catch(() => null);
 
+      int.client.lastInt?.set(int.guild?.id, m);
       let queue = int.client.queues.get(int.guild.id);
       if (!oldConnection && queue) {
         int.client.queues.delete(int.guild.id);

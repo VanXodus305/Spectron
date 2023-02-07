@@ -1,5 +1,5 @@
 import { getVoiceConnection } from "@discordjs/voice";
-import { ChannelType, EmbedBuilder, Interaction } from "discord.js";
+import { ChannelType, EmbedBuilder, Interaction, Message } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 
 export default {
@@ -9,7 +9,6 @@ export default {
   guildOnly: true,
   callback: async ({ interaction }: { interaction: Interaction }) => {
     let int = interaction as any;
-    int.client.lastInt?.set(int.guild?.id, int);
 
     try {
       if (!int.member?.voice?.channel) {
@@ -124,7 +123,7 @@ export default {
 
       await int.client.joinVoiceChannel(int.member?.voice?.channel);
 
-      await int
+      const m: Message = await int
         .reply({
           embeds: [
             new EmbedBuilder()
@@ -133,8 +132,10 @@ export default {
               )
               .setColor(11553764),
           ],
+          fetchReply: true,
         })
         .catch(() => null);
+      int.client.lastInt?.set(int.guild?.id, m);
     } catch (error) {
       console.error(error);
       await int
