@@ -7,6 +7,9 @@ import {
   ComponentType,
   EmbedBuilder,
   Interaction,
+  Message,
+  MessageActionRowComponent,
+  MessageComponentInteraction,
 } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 import { config } from "dotenv";
@@ -178,6 +181,20 @@ export default {
       }
 
       if (int.options?.getSubcommand() == "view") {
+        setTimeout(async () => {
+          const msg: Message = await int.fetchReply().catch(() => null);
+          const disabledRow = new ActionRowBuilder();
+          msg.components[0]?.components?.forEach((button: any) => {
+            const editedButton = ButtonBuilder.from(button).setDisabled(true);
+            disabledRow.addComponents(editedButton);
+          });
+          await int
+            .editReply({
+              embeds: msg.embeds,
+              components: disabledRow.components[0] ? [disabledRow] : [],
+            })
+            .catch(() => null);
+        }, 1000 * 60 * 5);
         const pages = Math.ceil(queue.tracks?.length / 15);
         const embeds: EmbedBuilder[] = [];
         for (let a = 0; a < pages; ++a) {
@@ -231,12 +248,10 @@ export default {
         const embed = embeds[page];
         const filter = (i: Interaction) => i.user.id == int.user?.id;
 
-        console.log(getRow(page));
-
         await int
           .reply({
             embeds: [embed],
-            components: getRow(page).components[0] ? [getRow(page)] : null,
+            components: getRow(page).components[0] ? [getRow(page)] : [],
             ephemeral: true,
           })
           .catch(() => null);

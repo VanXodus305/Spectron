@@ -287,6 +287,21 @@ export default {
             "9️⃣",
             "🔟",
           ];
+          setTimeout(async () => {
+            const msg: Message = await int.fetchReply().catch(() => null);
+            const disabledRow = new ActionRowBuilder();
+            msg.components[0]?.components?.forEach((menu: any) => {
+              const editedMenu =
+                StringSelectMenuBuilder.from(menu).setDisabled(true);
+              disabledRow.addComponents(editedMenu);
+            });
+            await int
+              .editReply({
+                embeds: msg.embeds,
+                components: disabledRow.components[0] ? [disabledRow] : [],
+              })
+              .catch(() => null);
+          }, 1000 * 60 * 1);
           songs.forEach((song: any) => {
             selectMenu.addOptions(
               new StringSelectMenuOptionBuilder()
