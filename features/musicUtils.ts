@@ -289,7 +289,7 @@ export default async (instance: WOK, client: any) => {
                         if (queue.paused) queue.paused = false;
                         queue.tracks.shift();
                         queue.tracks.push(
-                          client.createSong(song, songInfo.requester)
+                          client.createSong(song, song.requester)
                         );
                         player.play(client.getResource(queue, queue.tracks[0]));
                       } else {
