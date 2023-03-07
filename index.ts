@@ -14,14 +14,18 @@ client.on("ready", () => {
     client,
     commandsDir: path.join(__dirname, "commands"),
     featuresDir: path.join(__dirname, "features"),
-    testServers: ["751683524171530331", "746313837049020517"],
+    testServers: [
+      "751683524171530331",
+      "746313837049020517",
+      "765487805970382879",
+    ],
     disabledDefaultCommands: [
       DefaultCommands.ChannelCommand,
       DefaultCommands.CustomCommand,
       DefaultCommands.Prefix,
       DefaultCommands.RequiredPermissions,
       DefaultCommands.RequiredRoles,
-      DefaultCommands.ToggleCommand
+      DefaultCommands.ToggleCommand,
     ],
     events: {
       dir: path.join(__dirname, "events"),

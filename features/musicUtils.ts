@@ -1,4 +1,7 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   EmbedBuilder,
   Message,
   Snowflake,
@@ -390,11 +393,20 @@ export default async (instance: WOK, client: any) => {
       })
       .setThumbnail(song.image[song.image?.length - 1]?.link);
 
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`pause_${song.id}`)
+        .setStyle(ButtonStyle.Success)
+        .setLabel(`Pause`)
+        .setEmoji("⏸️")
+    );
+
     if (!queue.resumed) {
       if (queue.previous) {
         await song.message
           ?.reply({
             embeds: [songEmbed],
+            components: [row],
             failIfNotExists: false,
           })
           .catch(() => null);
@@ -402,7 +414,7 @@ export default async (instance: WOK, client: any) => {
         song.message
           ?.edit({
             embeds: [songEmbed],
-            components: [],
+            components: [row],
           })
           .catch(() => null);
       }

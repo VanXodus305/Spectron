@@ -8,8 +8,6 @@ import {
   EmbedBuilder,
   Interaction,
   Message,
-  MessageActionRowComponent,
-  MessageComponentInteraction,
 } from "discord.js";
 import { CommandObject, CommandType } from "wokcommands";
 import { config } from "dotenv";
