@@ -17,7 +17,6 @@ client.on("ready", () => {
     testServers: [
       "751683524171530331",
       "746313837049020517",
-      "765487805970382879",
     ],
     disabledDefaultCommands: [
       DefaultCommands.ChannelCommand,

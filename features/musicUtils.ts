@@ -136,23 +136,23 @@ export default async (instance: WOK, client: any) => {
         adapterCreator: channel.guild.voiceAdapterCreator,
       });
 
-      const networkStateChangeHandler = (
-        oldNetworkState: any,
-        newNetworkState: any
-      ) => {
-        const newUdp = Reflect.get(newNetworkState, "udp");
-        clearInterval(newUdp?.keepAliveInterval);
-      };
-      newConnection.on("stateChange", (oldState, newState) => {
-        Reflect.get(oldState, "networking")?.off(
-          "stateChange",
-          networkStateChangeHandler
-        );
-        Reflect.get(newState, "networking")?.on(
-          "stateChange",
-          networkStateChangeHandler
-        );
-      });
+      // const networkStateChangeHandler = (
+      //   oldNetworkState: any,
+      //   newNetworkState: any
+      // ) => {
+      //   const newUdp = Reflect.get(newNetworkState, "udp");
+      //   clearInterval(newUdp?.keepAliveInterval);
+      // };
+      // newConnection.on("stateChange", (oldState, newState) => {
+      //   Reflect.get(oldState, "networking")?.off(
+      //     "stateChange",
+      //     networkStateChangeHandler
+      //   );
+      //   Reflect.get(newState, "networking")?.on(
+      //     "stateChange",
+      //     networkStateChangeHandler
+      //   );
+      // });
 
       await client.delay(250);
 
@@ -398,7 +398,7 @@ export default async (instance: WOK, client: any) => {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId(`pause_${song.id}`)
-        .setStyle(ButtonStyle.Success)
+        .setStyle(ButtonStyle.Secondary)
         .setLabel(`Pause`)
         .setEmoji("⏸️")
     );
