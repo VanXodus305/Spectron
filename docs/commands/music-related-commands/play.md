@@ -1,0 +1,21 @@
+---
+description: Search and Play Music in a Voice/Stage Channel
+---
+
+# ⏯ /play
+
+### Usage
+
+<figure><img src="../../.gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
+
+### Output
+
+{% tabs %}
+{% tab title="When Nothing is Playing" %}
+<figure><img src="../../.gitbook/assets/image (38).png" alt=""><figcaption></figcaption></figure>
+{% endtab %}
+
+{% tab title="When Something is Playing" %}
+<figure><img src="../../.gitbook/assets/image (24).png" alt=""><figcaption></figcaption></figure>
+{% endtab %}
+{% endtabs %}
