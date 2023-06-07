@@ -395,20 +395,20 @@ export default async (instance: WOK, client: any) => {
       })
       .setThumbnail(song.image[song.image?.length - 1]?.link);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`pause_${song.id}`)
-        .setStyle(ButtonStyle.Secondary)
-        .setLabel(`Pause`)
-        .setEmoji("⏸️")
-    );
+    // const row = new ActionRowBuilder().addComponents(
+    //   new ButtonBuilder()
+    //     .setCustomId(`pause_${song.id}`)
+    //     .setStyle(ButtonStyle.Secondary)
+    //     .setLabel(`Pause`)
+    //     .setEmoji("⏸️")
+    // );
 
     if (!queue.resumed) {
       if (queue.previous) {
         await song.message
           ?.reply({
             embeds: [songEmbed],
-            components: [row],
+            // components: [row],
             failIfNotExists: false,
           })
           .catch(() => null);
@@ -416,7 +416,7 @@ export default async (instance: WOK, client: any) => {
         song.message
           ?.edit({
             embeds: [songEmbed],
-            components: [row],
+            // components: [row],
           })
           .catch(() => null);
       }
