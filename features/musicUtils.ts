@@ -408,6 +408,7 @@ export default async (instance: WOK, client: any) => {
         await song.message
           ?.reply({
             embeds: [songEmbed],
+            components: [],
             // components: [row],
             failIfNotExists: false,
           })
@@ -416,6 +417,7 @@ export default async (instance: WOK, client: any) => {
         song.message
           ?.edit({
             embeds: [songEmbed],
+            components: [],
             // components: [row],
           })
           .catch(() => null);
