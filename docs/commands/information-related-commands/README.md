@@ -2,10 +2,10 @@
 
 ## List of Information Related Commands
 
-#### ``[`/help`](help.md)``
+#### [`/help`](help.md)
 
 > Provides the List of Commands and their Details
 
-#### ``[`/ping`](ping.md)``
+#### [`/ping`](ping.md)
 
 > Provides the Bot's Latency and Uptime

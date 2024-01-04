@@ -6,7 +6,7 @@ description: >-
 
 # 📖 Spectron Documentation
 
-<table data-card-size="large" data-view="cards"><thead><tr><th></th></tr></thead><tbody><tr><td><strong></strong><a href="https://discord.com/api/oauth2/authorize?client_id=775370551840997376&#x26;permissions=279214115840&#x26;scope=bot%20applications.commands"><strong>Invite the Bot!</strong></a><strong></strong></td></tr><tr><td><strong></strong><a href="https://status.spectron.tk/"><strong>Check Status</strong></a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards"><thead><tr><th></th></tr></thead><tbody><tr><td><a href="https://discord.com/api/oauth2/authorize?client_id=775370551840997376&#x26;permissions=279214115840&#x26;scope=bot%20applications.commands"><strong>Invite the Bot!</strong></a></td></tr><tr><td><a href="https://status.spectron.tk/"><strong>Check Status</strong></a></td></tr></tbody></table>
 
 ### ✨ Features
 
@@ -25,22 +25,22 @@ description: >-
 
 ### 🚧 Dependencies
 
-* ``[`@discordjs/opus`](https://www.npmjs.com/package/@discordjs/opus)``
-* ``[`@discordjs/voice`](https://www.npmjs.com/package/@discordjs/voice)``
-* ``[`cross-fetch`](https://www.npmjs.com/package/cross-fetch)``
-* ``[`discord.js`](https://www.npmjs.com/package/discord.js)``
-* ``[`express`](https://www.npmjs.com/package/express)``
-* ``[`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static)``
-* ``[`sodium-native`](https://www.npmjs.com/package/sodium-native)``
-* ``[`wokcommands`](https://www.npmjs.com/package/wokcommands)``
+* [`@discordjs/opus`](https://www.npmjs.com/package/@discordjs/opus)
+* [`@discordjs/voice`](https://www.npmjs.com/package/@discordjs/voice)
+* [`cross-fetch`](https://www.npmjs.com/package/cross-fetch)
+* [`discord.js`](https://www.npmjs.com/package/discord.js)
+* [`express`](https://www.npmjs.com/package/express)
+* [`ffmpeg-static`](https://www.npmjs.com/package/ffmpeg-static)
+* [`sodium-native`](https://www.npmjs.com/package/sodium-native)
+* [`wokcommands`](https://www.npmjs.com/package/wokcommands)
 * Optional Dependencies
-  * ``[`bufferutil`](https://www.npmjs.com/package/bufferutil)``
-  * ``[`erlpack`](https://github.com/discord/erlpack)``
-  * ``[`utf-8-validate`](https://www.npmjs.com/package/utf-8-validate)``
-  * ``[`zlib-sync`](https://www.npmjs.com/package/zlib-sync)``
+  * [`bufferutil`](https://www.npmjs.com/package/bufferutil)
+  * [`erlpack`](https://github.com/discord/erlpack)
+  * [`utf-8-validate`](https://www.npmjs.com/package/utf-8-validate)
+  * [`zlib-sync`](https://www.npmjs.com/package/zlib-sync)
 * Development Dependencies
-  * ``[`dotenv`](https://www.npmjs.com/package/dotenv)``
-  * ``[`ts-node`](https://www.npmjs.com/package/ts-node)``
+  * [`dotenv`](https://www.npmjs.com/package/dotenv)
+  * [`ts-node`](https://www.npmjs.com/package/ts-node)
 
 ###
 
