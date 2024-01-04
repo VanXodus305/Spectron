@@ -6,7 +6,7 @@ description: >-
 
 # 📖 Spectron Documentation
 
-<table data-card-size="large" data-view="cards"><thead><tr><th></th></tr></thead><tbody><tr><td><a href="https://discord.com/api/oauth2/authorize?client_id=775370551840997376&#x26;permissions=279214115840&#x26;scope=bot%20applications.commands"><strong>Invite the Bot!</strong></a></td></tr><tr><td><a href="https://status.spectron.tk/"><strong>Check Status</strong></a></td></tr></tbody></table>
+<table data-card-size="large" data-view="cards"><thead><tr><th></th></tr></thead><tbody><tr><td><a href="https://discord.com/api/oauth2/authorize?client_id=775370551840997376&#x26;permissions=279214115840&#x26;scope=bot%20applications.commands"><strong>Invite the Bot!</strong></a></td></tr><tr><td><a href="https://spectron-vanxodus305.koyeb.app"><strong>Check Status</strong></a></td></tr></tbody></table>
 
 ### ✨ Features
 
