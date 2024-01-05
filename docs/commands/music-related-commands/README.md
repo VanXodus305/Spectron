@@ -2,58 +2,58 @@
 
 List of Information Related Commands
 
-#### ``[`/autoplay`](autoplay.md)``
+#### [`/autoplay`](autoplay.md)
 
 > Automatically Play Recommended Tracks after the Queue ends
 
-#### ``[`/join`](join.md)``
+#### [`/join`](join.md)
 
 > Joins a Voice/Stage Channel
 
-#### ``[`/leave`](leave.md)``
+#### [`/leave`](leave.md)
 
 > Stops Playing Music and Leaves a Voice/Stage Channel
 
-#### ``[`/loop queue`](loop-queue.md)``
+#### [`/loop queue`](loop-queue.md)
 
 > Loops the Currently Playing Queue
 
-#### ``[`/loop track`](loop-track.md)``
+#### [`/loop track`](loop-track.md)
 
 > Loops the Currently Playing Track
 
-#### ``[`/nowplaying`](nowplaying.md)``
+#### [`/nowplaying`](nowplaying.md)
 
 > Shows the Currently Playing Track on the Server
 
-#### ``[`/pause`](pause.md)``
+#### [`/pause`](pause.md)
 
 > Pauses the Currently Playing Track on the Server
 
-#### ``[`/play`](play.md)``
+#### [`/play`](play.md)
 
 > Search and Play Music in a Voice/Stage Channel
 
-#### ``[`/queue clear`](queue-clear.md)``
+#### [`/queue clear`](queue-clear.md)
 
 > Removes All Tracks from the Current Queue
 
-#### ``[`/queue view`](queue-view.md)``
+#### [`/queue view`](queue-view.md)
 
 > Provides the List of Tracks in the Current Queue
 
-#### ``[`/resume`](resume.md)``
+#### [`/resume`](resume.md)
 
 > Resumes the Currently Playing Track on the Server
 
-#### ``[`/shuffle`](shuffle.md)``
+#### [`/shuffle`](shuffle.md)
 
 > Shuffles the Currently Playing Queue
 
-#### ``[`/skip`](skip.md)``
+#### [`/skip`](skip.md)
 
 > Skips the Track that is Currently Playing
 
-#### ``[`/stop`](stop.md)``
+#### [`/stop`](stop.md)
 
 > Stops Playing Music and Clears the Queue
