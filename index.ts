@@ -14,10 +14,7 @@ client.on("ready", () => {
     client,
     commandsDir: path.join(__dirname, "commands"),
     featuresDir: path.join(__dirname, "features"),
-    testServers: [
-      "751683524171530331",
-      "746313837049020517",
-    ],
+    testServers: ["751683524171530331", "746313837049020517"],
     disabledDefaultCommands: [
       DefaultCommands.ChannelCommand,
       DefaultCommands.CustomCommand,
