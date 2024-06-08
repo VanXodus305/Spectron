@@ -1,6 +1,4 @@
 import {
-  Client,
-  CommandInteraction,
   EmbedBuilder,
   Interaction,
 } from "discord.js";
