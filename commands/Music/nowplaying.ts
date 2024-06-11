@@ -42,7 +42,9 @@ export default {
           name: "👥 Artists",
           value:
             "```\n" +
-            int.client.decodeHTMLEntities(song.primaryArtists) +
+            int.client.decodeHTMLEntities(
+              song.artists.primary.map((artist: any) => artist.name).join(", ")
+            ) +
             "```",
           inline: false,
         })
@@ -54,12 +56,7 @@ export default {
         })
         .addFields({
           name: "🕒 Duration",
-          value:
-            "```\n" +
-            int.client.formatDuration(
-              int.client.decodeHTMLEntities(song.duration)
-            ) +
-            "```",
+          value: "```\n" + int.client.formatDuration(song.duration) + "```",
           inline: true,
         })
         .addFields({
@@ -79,7 +76,7 @@ export default {
             "]```**",
           inline: false,
         })
-        .setThumbnail(song.image[song.image?.length - 1]?.link);
+        .setThumbnail(song.image[song.image?.length - 1]?.url);
       await int
         .reply({
           embeds: [songEmbed],

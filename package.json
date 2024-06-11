@@ -8,8 +8,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "ts-node .",
-    "dev": "ts-node .",
-    "test": "nodemon index.ts",
+    "dev": "nodemon index.ts",
+    "test": "",
     "sample": "ts-node sample.ts"
   },
   "keywords": [],

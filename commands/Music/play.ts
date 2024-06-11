@@ -246,7 +246,7 @@ export default {
                     value: `<@${int.member.user?.id}>`,
                     inline: true,
                   })
-                  .setThumbnail(`${song.image[song.image?.length - 1]?.link}`),
+                  .setThumbnail(`${song.image[song.image?.length - 1]?.url}`),
               ],
               components: [],
             })
@@ -310,7 +310,11 @@ export default {
                 )
                 .setDescription(
                   int.client
-                    ?.decodeHTMLEntities(song.primaryArtists)
+                    ?.decodeHTMLEntities(
+                      song.artists.primary
+                        .map((artist: any) => artist.name)
+                        .join(", ")
+                    )
                     .substring(0, 101)
                 )
                 .setEmoji(emojis[songs.indexOf(song)])

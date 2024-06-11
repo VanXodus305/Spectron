@@ -95,7 +95,7 @@ export default async (instance: WOK, client: any) => {
   client.getRecommendedSong = async (reference: any) => {
     try {
       let query = reference?.name + " ";
-      query += reference.primaryArtists?.replace(",", "");
+      query += reference.artists.primary.map((artist: any) => artist.name).join(", ").replace(",", "");
       const recommendation: string = await client.getSpotifyRecommendation(
         query
       );
@@ -218,7 +218,7 @@ export default async (instance: WOK, client: any) => {
   client.getResource = (queue: any, songInfo: any) => {
     const url = songInfo.downloadUrl;
     if (!url) return null;
-    const resource = createAudioResource(url[url?.length - 1]?.link, {
+    const resource = createAudioResource(url[url?.length - 1]?.url, {
       inlineVolume: false,
       metadata: {
         details: songInfo,
@@ -369,7 +369,12 @@ export default async (instance: WOK, client: any) => {
       .setTitle(`${client.decodeHTMLEntities(song.name)}`)
       .addFields({
         name: "👥 Artists",
-        value: "```\n" + client.decodeHTMLEntities(song.primaryArtists) + "```",
+        value:
+          "```\n" +
+          client.decodeHTMLEntities(
+            song.artists.primary.map((artist: any) => artist.name).join(", ")
+          ) +
+          "```",
         inline: false,
       })
       .addFields({
@@ -379,10 +384,7 @@ export default async (instance: WOK, client: any) => {
       })
       .addFields({
         name: "🕒 Duration",
-        value:
-          "```\n" +
-          client.formatDuration(client.decodeHTMLEntities(song.duration)) +
-          "```",
+        value: "```\n" + client.formatDuration(song.duration) + "```",
         inline: true,
       })
       .addFields({
@@ -390,7 +392,7 @@ export default async (instance: WOK, client: any) => {
         value: `<@${song.requester.id}>`,
         inline: true,
       })
-      .setThumbnail(song.image[song.image?.length - 1]?.link);
+      .setThumbnail(song.image[song.image?.length - 1]?.url);
 
     // const row = new ActionRowBuilder().addComponents(
     //   new ButtonBuilder()
