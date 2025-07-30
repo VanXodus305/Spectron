@@ -16,7 +16,7 @@
 
 <div align="center">
 
-[![Invite Bot](https://img.shields.io/badge/Invite%20Bot-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=775370551840997376&permissions=279214115840&scope=bot%20applications.commands)
+[![Invite Bot](https://img.shields.io/badge/Invite%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=775370551840997376&permissions=279214115840&scope=bot%20applications.commands)
 [![Check Status](https://img.shields.io/badge/Check%20Status-00D26A?style=for-the-badge&logo=statuspage&logoColor=white)](https://spectron-vanxodus305.koyeb.app)
 
 </div>
