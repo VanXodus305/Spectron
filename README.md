@@ -18,6 +18,7 @@
 
 [![Invite Bot](https://img.shields.io/badge/Invite%20Bot-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/api/oauth2/authorize?client_id=775370551840997376&permissions=279214115840&scope=bot%20applications.commands)
 [![Check Status](https://img.shields.io/badge/Check%20Status-00D26A?style=for-the-badge&logo=statuspage&logoColor=white)](https://spectron-vanxodus305.koyeb.app)
+[![Documentation](https://img.shields.io/badge/Documentation-FF6B35?style=for-the-badge&logo=gitbook&logoColor=white)](https://spectron.gitbook.io)
 
 </div>
 
@@ -252,8 +253,8 @@ If you encounter any issues or need support:
 
 ## 📋 Planned Features
 
+- [x] Advanced queue manipulation (remove specific positions)
 - [ ] Personal playlist management
-- [ ] Advanced queue manipulation (remove specific positions)
 - [ ] Interactive buttons for player controls
 - [ ] Volume control per server
 - [ ] Music filters and effects
